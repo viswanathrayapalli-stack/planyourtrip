@@ -16,6 +16,7 @@ def register_exception_handlers(app: FastAPI) -> None:
             content={
                 "success": False,
                 "message": exc.message,
+                "data": None,
             },
         )
 
@@ -26,5 +27,6 @@ def register_exception_handlers(app: FastAPI) -> None:
             content={
                 "success": False,
                 "message": exc.message,
+                "data": None,
             },
         )

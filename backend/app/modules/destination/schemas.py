@@ -6,6 +6,11 @@ class DestinationCreate(BaseModel):
     country: str
     description: str | None = None
 
+class DestinationUpdate(BaseModel):
+    name: str | None = None
+    country: str | None = None
+    description: str | None = None
+    is_active: bool | None = None
 
 class DestinationResponse(BaseModel):
     id: int

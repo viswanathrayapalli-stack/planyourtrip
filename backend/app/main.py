@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from app.core.lifespan import lifespan
 from app.core.settings import settings
 from app.shared.exceptions.handlers import register_exception_handlers
+from app.modules.destination.api import router as destination_router
 
 def create_app() -> FastAPI:
     app = FastAPI(
@@ -13,6 +14,7 @@ def create_app() -> FastAPI:
     )
 
     register_exception_handlers(app)
+    app.include_router(destination_router)
 
     @app.get("/")
     async def root():

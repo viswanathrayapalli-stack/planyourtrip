@@ -13,8 +13,13 @@ class Settings(BaseSettings):
     host: str = "127.0.0.1"
     port: int = 8000
 
+    # database_url: str = (
+    #     "postgresql://postgres:password@localhost:5432/planyourtrip"
+        
+    # )
+
     database_url: str = (
-        "postgresql://postgres:password@localhost:5432/planyourtrip"
+        "postgresql+psycopg://postgres:password@localhost:5432/planyourtrip"
     )
 
     log_level: str = "INFO"

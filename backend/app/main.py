@@ -1,20 +1,28 @@
 from fastapi import FastAPI
 
+from app.core.lifespan import lifespan
+from app.core.settings import settings
 
 def create_app() -> FastAPI:
     app = FastAPI(
-        title="PlanYourTrip API",
-        description="Backend API for PlanYourTrip",
-        version="0.1.0",
+        title=settings.app_name,
+        version=settings.app_version,
+        lifespan=lifespan,
     )
 
     @app.get("/")
     async def root():
-        return {"message": "Welcome to PlanYourTrip API"}
+        return {
+            "application": settings.app_name,
+            "version": settings.app_version,
+        }
 
     @app.get("/health")
     async def health():
-        return {"status": "healthy"}
+        return {
+            "status": "healthy",
+            "environment": settings.environment,
+        }
 
     return app
 

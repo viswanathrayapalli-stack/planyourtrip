@@ -1,0 +1,26 @@
+# Virtual environments
+.venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Test artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Type checking
+.mypy_cache/
+
+# Linting
+.ruff_cache/
+
+# Environment variables
+.env
+
+# IDE
+.vscode/
+
+# macOS
+.DS_Store

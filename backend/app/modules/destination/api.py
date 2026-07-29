@@ -9,40 +9,47 @@ from app.modules.destination.schemas import (
 from app.modules.destination.service import DestinationService
 from app.shared.schemas import MessageResponse
 
+from sqlalchemy.orm import Session
+from app.shared.database.session import get_db
+
 #from app.shared.utils.response import success_response
 
 router = APIRouter(prefix="/destinations", tags=["Destinations"])
 
 
-@router.get("", response_model=list[DestinationResponse])
+@router.get("", response_model=list[DestinationResponse])   
 def get_destinations(
+    db: Session = Depends(get_db),
     service: DestinationService = Depends(get_destination_service),
 ):
-    return service.get_all()
+    return service.get_all(db)  
     
 
 
 @router.post("", response_model=DestinationResponse)
 def create_destination(
     request: DestinationCreate,
+    db: Session = Depends(get_db),
     service: DestinationService = Depends(get_destination_service),
 ):
-    return service.create(request)
+    return service.create(db,request)
 
 @router.get("/{destination_id}", response_model=DestinationResponse)
 def get_destination(
     destination_id: int,
+    db: Session = Depends(get_db),
     service: DestinationService = Depends(get_destination_service),
 ):
-    return service.get_by_id(destination_id)
+    return service.get_by_id(db,destination_id)
 
 @router.put("/{destination_id}", response_model=DestinationResponse)
 def update_destination(
     destination_id: int,
     request: DestinationUpdate,
+    db: Session = Depends(get_db),
     service: DestinationService = Depends(get_destination_service),
 ):
-    return service.update(destination_id, request)
+    return service.update(db, destination_id, request)
 
 
 @router.delete(
@@ -51,9 +58,10 @@ def update_destination(
 )
 def delete_destination(
     destination_id: int,
+    db: Session = Depends(get_db),
     service: DestinationService = Depends(get_destination_service),
 ):
-    service.delete(destination_id)
+    service.delete(db, destination_id)
 
     return MessageResponse(
         success=True,

@@ -1,3 +1,4 @@
+from sqlalchemy.orm import Session
 from app.modules.destination.constants import (
     DESTINATION_ALREADY_EXISTS,
     DESTINATION_NOT_FOUND,
@@ -19,19 +20,20 @@ class DestinationService:
     def __init__(self, repository: DestinationRepository):
         self.repository = repository
 
-    def get_all(self):
-        return self.repository.get_all()
 
-    def get_by_id(self, destination_id: int):
-        destination = self.repository.get_by_id(destination_id)
+    def get_all(self, db: Session):
+        return self.repository.get_all(db)
+
+    def get_by_id(self, db: Session, destination_id: int,):
+        destination = self.repository.get_by_id(db, destination_id)
 
         if destination is None:
             raise ResourceNotFoundException(DESTINATION_NOT_FOUND)
 
         return destination
 
-    def create(self, request: DestinationCreate):
-        existing = self.repository.get_by_name(request.name)
+    def create(self, db: Session, request: DestinationCreate):
+        existing = self.repository.get_by_name(db, request.name)
 
         if existing:
             raise ValidationException(DESTINATION_ALREADY_EXISTS)
@@ -42,14 +44,14 @@ class DestinationService:
             description=request.description,
         )
 
-        return self.repository.create(destination)
+        return self.repository.create(db, destination)    
 
-    def update(self, destination_id: int, request: DestinationUpdate):
-        destination = self.get_by_id(destination_id)
+    def update(self, db: Session, destination_id: int, request: DestinationUpdate):
+        destination = self.get_by_id(db, destination_id)
 
         if request.name is not None:
-            existing = self.repository.get_by_name(request.name)
-
+            existing = self.repository.get_by_name(db, request.name)
+            
             if existing and existing.id != destination.id:
                 raise ValidationException(DESTINATION_ALREADY_EXISTS)
 
@@ -64,8 +66,8 @@ class DestinationService:
         if request.is_active is not None:
             destination.is_active = request.is_active
 
-        return self.repository.update(destination)
+        return self.repository.update(db, destination)
 
-    def delete(self, destination_id: int):
-        destination = self.get_by_id(destination_id)
-        self.repository.delete(destination)
+    def delete(self, db: Session, destination_id: int):
+        destination = self.get_by_id(db, destination_id)
+        self.repository.delete(db, destination)

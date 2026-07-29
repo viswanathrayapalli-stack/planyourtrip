@@ -8,6 +8,7 @@ from alembic import context
 from app.core.settings import settings
 from app.shared.database.base import Base
 from app.modules.destination.models import Destination
+from app.modules.trip.models import Trip
 
 # Import models here as they are created.
 # Example:

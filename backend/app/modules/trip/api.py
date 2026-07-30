@@ -1,13 +1,14 @@
 from fastapi import APIRouter, Depends, Response, status
 from sqlalchemy.orm import Session
 
-from app.core.dependencies import get_db, get_trip_service
+from app.core.dependencies import get_current_user, get_db, get_trip_service
 from app.modules.trip.schemas import (
     TripCreate,
     TripResponse,
     TripUpdate,
 )
 from app.modules.trip.service import TripService
+from app.modules.user.models import User
 
 router = APIRouter(prefix="/trips", tags=["Trips"])
 
@@ -19,8 +20,9 @@ router = APIRouter(prefix="/trips", tags=["Trips"])
 def get_all(
     db: Session = Depends(get_db),
     service: TripService = Depends(get_trip_service),
+    current_user: User = Depends(get_current_user),
 ):
-    return service.get_all(db)
+    return service.get_all(db, current_user.id)
 
 
 @router.get(
@@ -31,8 +33,9 @@ def get_by_id(
     trip_id: int,
     db: Session = Depends(get_db),
     service: TripService = Depends(get_trip_service),
+    current_user: User = Depends(get_current_user),
 ):
-    return service.get_by_id(db, trip_id)
+    return service.get_by_id(db, trip_id, current_user.id)
 
 
 @router.post(
@@ -44,8 +47,9 @@ def create(
     request: TripCreate,
     db: Session = Depends(get_db),
     service: TripService = Depends(get_trip_service),
+    current_user: User = Depends(get_current_user),
 ):
-    return service.create(db, request)
+    return service.create(db, current_user.id, request)
 
 
 @router.put(
@@ -57,10 +61,12 @@ def update(
     request: TripUpdate,
     db: Session = Depends(get_db),
     service: TripService = Depends(get_trip_service),
+    current_user: User = Depends(get_current_user),
 ):
     return service.update(
         db=db,
         trip_id=trip_id,
+        user_id=current_user.id,
         request=request,
     )
 
@@ -73,6 +79,11 @@ def delete(
     trip_id: int,
     db: Session = Depends(get_db),
     service: TripService = Depends(get_trip_service),
+    current_user: User = Depends(get_current_user),
 ):
-    service.delete(db, trip_id)
+    service.delete(
+        db=db,
+        trip_id=trip_id,
+        user_id=current_user.id,
+    )
     return Response(status_code=status.HTTP_204_NO_CONTENT)

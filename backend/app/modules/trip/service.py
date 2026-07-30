@@ -17,16 +17,18 @@ class TripService:
     def get_all(
         self,
         db: Session,
+        user_id: int,
     ) -> list[Trip]:
-        return self.repository.get_all(db)
+        return self.repository.get_all_by_user(db, user_id)
 
     def get_by_id(
         self,
         db: Session,
         trip_id: int,
+        user_id: int,
     ) -> Trip:
 
-        trip = self.repository.get_by_id(db, trip_id)
+        trip = self.repository.get_by_id_and_user(db, trip_id, user_id)
 
         if trip is None:
             raise ResourceNotFoundException("Trip not found.")
@@ -36,10 +38,11 @@ class TripService:
     def create(
         self,
         db: Session,
+        user_id: int,
         request: TripCreate,
     ) -> Trip:
 
-        trip = Trip(**request.model_dump())
+        trip = Trip(**request.model_dump(), user_id=user_id)
 
         return self.repository.create(db, trip)
 
@@ -47,10 +50,11 @@ class TripService:
         self,
         db: Session,
         trip_id: int,
+        user_id: int,
         request: TripUpdate,
     ) -> Trip:
 
-        trip = self.get_by_id(db, trip_id)
+        trip = self.get_by_id(db, trip_id, user_id)
 
         update_data = request.model_dump(exclude_unset=True)
 
@@ -63,8 +67,9 @@ class TripService:
         self,
         db: Session,
         trip_id: int,
+        user_id: int,
     ) -> None:
 
-        trip = self.get_by_id(db, trip_id)
+        trip = self.get_by_id(db, trip_id, user_id)
 
         self.repository.delete(db, trip)

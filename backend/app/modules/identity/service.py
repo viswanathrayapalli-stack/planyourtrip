@@ -1,4 +1,3 @@
-from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.security import (
@@ -15,6 +14,7 @@ from app.modules.identity.schemas import (
     TokenResponse,
 )
 from app.modules.user.repository import user_repository
+from app.shared.exceptions.exceptions import AuthenticationException
 
 
 class IdentityService:
@@ -32,25 +32,16 @@ class IdentityService:
         )
 
         if user is None:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail=INVALID_CREDENTIALS,
-            )
+            raise AuthenticationException(INVALID_CREDENTIALS)
 
         if not verify_password(
             request.password,
             user.password_hash,
         ):
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail=INVALID_CREDENTIALS,
-            )
+            raise AuthenticationException(INVALID_CREDENTIALS)
 
         if not user.is_active:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail=INACTIVE_USER,
-            )
+            raise AuthenticationException(INACTIVE_USER)
 
         token = create_access_token(
             {

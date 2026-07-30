@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_current_user
-from app.modules.identity.constants import LOGIN_SUCCESS
+from app.modules.identity.constants import CURRENT_USER_RETRIEVED, LOGIN_SUCCESS
 from app.modules.identity.schemas import (
     CurrentUserResponse,
     LoginRequest,
@@ -13,10 +14,6 @@ from app.modules.user.models import User
 from app.shared.database.session import get_db
 from app.shared.schemas.api_response import ApiResponse
 from app.shared.utils.response import success_response
-from app.modules.identity.constants import (
-    CURRENT_USER_RETRIEVED,
-    LOGIN_SUCCESS,
-)
 
 router = APIRouter(
     prefix="/identity",
@@ -26,21 +23,23 @@ router = APIRouter(
 
 @router.post(
     "/login",
-    response_model=ApiResponse[TokenResponse],
+    response_model=TokenResponse,
 )
 def login(
-    request: LoginRequest,
+    form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db),
 ):
+    request = LoginRequest(
+        email=form_data.username,
+        password=form_data.password,
+    )
+
     token = identity_service.login(
         db=db,
         request=request,
     )
 
-    return success_response(
-        data=token,
-        message=LOGIN_SUCCESS,
-    )
+    return token
 
 
 @router.get(
@@ -52,9 +51,5 @@ def get_current_user_profile(
 ):
     return success_response(
         data=CurrentUserResponse.model_validate(current_user),
-        message="Current user retrieved successfully.",
+        message=CURRENT_USER_RETRIEVED,
     )
-    return success_response(
-    data=CurrentUserResponse.model_validate(current_user),
-    message=CURRENT_USER_RETRIEVED,
-)

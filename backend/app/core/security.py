@@ -5,6 +5,7 @@ from jose import jwt
 from pwdlib import PasswordHash
 
 from app.core.settings import settings
+from jose import JWTError, jwt
 
 # -------------------------
 # Password Hashing
@@ -49,4 +50,14 @@ def create_access_token(
         to_encode,
         settings.secret_key,
         algorithm=settings.algorithm,
+    )
+
+def decode_access_token(token: str) -> dict:
+    """
+    Decode and validate a JWT access token.
+    """
+    return jwt.decode(
+        token,
+        settings.secret_key,
+        algorithms=[settings.algorithm],
     )

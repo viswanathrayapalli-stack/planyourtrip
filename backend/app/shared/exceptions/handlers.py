@@ -1,11 +1,12 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
+
 from app.shared.exceptions.exceptions import (
     AppException,
+    ResourceAlreadyExistsException,
     ResourceNotFoundException,
 )
-
 
 def register_exception_handlers(app: FastAPI) -> None:
 
@@ -13,6 +14,19 @@ def register_exception_handlers(app: FastAPI) -> None:
     async def app_exception_handler(request: Request, exc: AppException):
         return JSONResponse(
             status_code=400,
+            content={
+                "success": False,
+                "message": exc.message,
+                "data": None,
+            },
+        )
+    @app.exception_handler(ResourceAlreadyExistsException)
+    async def already_exists_handler(
+        request: Request,
+        exc: ResourceAlreadyExistsException,
+    ):
+        return JSONResponse(
+            status_code=409,
             content={
                 "success": False,
                 "message": exc.message,

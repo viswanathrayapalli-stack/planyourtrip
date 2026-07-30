@@ -9,6 +9,7 @@ from app.core.settings import settings
 from app.shared.database.base import Base
 from app.modules.destination.models import Destination
 from app.modules.trip.models import Trip
+from app.modules.user.models import User
 
 # Import models here as they are created.
 # Example:

@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 
+from app.core.security import hash_password
 from app.modules.user.models import User
 from app.modules.user.repository import UserRepository
 from app.modules.user.schemas import UserCreate, UserUpdate
@@ -52,11 +53,12 @@ class UserService:
                 "Email is already registered."
             )
 
+        hashed_password = hash_password(request.password)
+
         user = User(
             full_name=request.full_name,
             email=request.email,
-            # Temporary - will replace with password hashing
-            password_hash=request.password,
+            password_hash=hashed_password,
             is_active=True,
         )
 
@@ -74,7 +76,9 @@ class UserService:
         update_data = request.model_dump(exclude_unset=True)
 
         if "password" in update_data:
-            update_data["password_hash"] = update_data.pop("password")
+            update_data["password_hash"] = hash_password(
+                update_data.pop("password")
+            )
 
         for key, value in update_data.items():
             setattr(user, key, value)

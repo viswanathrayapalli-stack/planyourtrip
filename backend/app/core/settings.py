@@ -13,16 +13,18 @@ class Settings(BaseSettings):
     host: str = "127.0.0.1"
     port: int = 8000
 
-    # database_url: str = (
-    #     "postgresql://postgres:password@localhost:5432/planyourtrip"
-        
-    # )
-
     database_url: str = (
         "postgresql+psycopg://postgres:password@localhost:5432/planyourtrip"
     )
 
     log_level: str = "INFO"
+
+    # ==========================
+    # JWT Authentication
+    # ==========================
+    secret_key: str = "change-this-to-a-secure-random-key"
+    algorithm: str = "HS256"
+    access_token_expire_minutes: int = 60
 
     model_config = SettingsConfigDict(
         env_file=".env",

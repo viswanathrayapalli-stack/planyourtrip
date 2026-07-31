@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_db, get_place_service
@@ -8,7 +8,6 @@ from app.modules.place.schemas import (
     PlaceUpdate,
 )
 from app.modules.place.service import PlaceService
-from app.shared.schemas import MessageResponse
 
 router = APIRouter(
     prefix="/places",
@@ -24,7 +23,11 @@ def get_all(
     return service.get_all(db)
 
 
-@router.post("", response_model=PlaceResponse)
+@router.post(
+    "",
+    response_model=PlaceResponse,
+    status_code=status.HTTP_201_CREATED,
+)
 def create(
     request: PlaceCreate,
     db: Session = Depends(get_db),
@@ -54,7 +57,7 @@ def update(
 
 @router.delete(
     "/{place_id}",
-    response_model=MessageResponse,
+    status_code=status.HTTP_204_NO_CONTENT,
 )
 def delete(
     place_id: int,
@@ -62,8 +65,3 @@ def delete(
     service: PlaceService = Depends(get_place_service),
 ):
     service.delete(db, place_id)
-
-    return MessageResponse(
-        success=True,
-        message="Place deleted successfully.",
-    )

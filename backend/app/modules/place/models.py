@@ -1,5 +1,5 @@
-from sqlalchemy import Float, Integer, String, Text
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import Float, ForeignKey, Integer, String, Text
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.shared.database.base import Base
 from app.shared.models import AuditMixin
@@ -52,4 +52,15 @@ class Place(AuditMixin, Base):
     place_type: Mapped[str | None] = mapped_column(
         String(50),
         nullable=True,
+    )
+
+    destination_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("destinations.id"),
+        nullable=False,
+    )
+
+    destination = relationship(
+        "Destination",
+        back_populates="places",
     )

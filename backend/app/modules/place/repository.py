@@ -20,6 +20,10 @@ class PlaceRepository:
         stmt = select(Place)
         return list(db.scalars(stmt).all())
 
+    def get_by_destination_id(self, db: Session, destination_id: int) -> list[Place]:
+        stmt = select(Place).where(Place.destination_id == destination_id)
+        return list(db.scalars(stmt).all())
+
     def update(self, db: Session, place: Place) -> Place:
         db.commit()
         db.refresh(place)

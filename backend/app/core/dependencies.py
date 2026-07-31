@@ -20,9 +20,13 @@ from app.shared.exceptions.exceptions import AuthenticationException
 
 def get_destination_service(
     db: Session = Depends(get_db),
+    place_service: PlaceService = Depends(get_place_service),
 ):
     repository = DestinationRepository()
-    return DestinationService(repository)
+    return DestinationService(
+        repository,
+        place_service,
+    )
 
 
 def get_trip_service(

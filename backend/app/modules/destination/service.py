@@ -9,6 +9,7 @@ from app.modules.destination.schemas import (
     DestinationCreate,
     DestinationUpdate,
 )
+from app.modules.place.service import PlaceService
 from app.shared.exceptions.exceptions import (
     ResourceNotFoundException,
     ValidationException,
@@ -17,8 +18,9 @@ from app.shared.exceptions.exceptions import (
 
 class DestinationService:
 
-    def __init__(self, repository: DestinationRepository):
+    def __init__(self, repository: DestinationRepository, place_service: PlaceService):
         self.repository = repository
+        self.place_service = place_service
 
 
     def get_all(self, db: Session):
@@ -31,6 +33,13 @@ class DestinationService:
             raise ResourceNotFoundException(DESTINATION_NOT_FOUND)
 
         return destination
+
+    def get_places(self, db: Session, destination_id: int):
+        self.get_by_id(db, destination_id)
+        return self.place_service.get_by_destination_id(
+            db,
+            destination_id,
+        )
 
     def create(self, db: Session, request: DestinationCreate):
         existing = self.repository.get_by_name(db, request.name)

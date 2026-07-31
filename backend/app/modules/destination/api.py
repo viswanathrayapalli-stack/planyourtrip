@@ -7,6 +7,7 @@ from app.modules.destination.schemas import (
     DestinationUpdate,
 )
 from app.modules.destination.service import DestinationService
+from app.modules.place.schemas import PlaceResponse
 from app.shared.schemas import MessageResponse
 
 from sqlalchemy.orm import Session
@@ -41,6 +42,18 @@ def get_destination(
     service: DestinationService = Depends(get_destination_service),
 ):
     return service.get_by_id(db,destination_id)
+
+
+@router.get(
+    "/{destination_id}/places",
+    response_model=list[PlaceResponse],
+)
+def get_destination_places(
+    destination_id: int,
+    db: Session = Depends(get_db),
+    service: DestinationService = Depends(get_destination_service),
+):
+    return service.get_places(db, destination_id)
 
 @router.put("/{destination_id}", response_model=DestinationResponse)
 def update_destination(

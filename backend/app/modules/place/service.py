@@ -7,8 +7,8 @@ from app.modules.place.schemas import PlaceCreate, PlaceUpdate
 
 class PlaceService:
 
-    def __init__(self):
-        self.repository = PlaceRepository()
+    def __init__(self, repository: PlaceRepository):
+        self.repository = repository
 
     def create(self, db: Session, request: PlaceCreate) -> Place:
         place = Place(**request.model_dump())

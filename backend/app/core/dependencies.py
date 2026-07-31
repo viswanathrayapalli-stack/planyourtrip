@@ -7,6 +7,8 @@ from app.core.security import decode_access_token
 from app.modules.destination.repository import DestinationRepository
 from app.modules.destination.service import DestinationService
 from app.modules.identity.constants import UNAUTHORIZED
+from app.modules.place.repository import PlaceRepository
+from app.modules.place.service import PlaceService
 from app.modules.trip.repository import TripRepository
 from app.modules.trip.service import TripService
 from app.modules.user.models import User
@@ -28,6 +30,13 @@ def get_trip_service(
 ):
     repository = TripRepository()
     return TripService(repository)
+
+
+def get_place_service(
+    db: Session = Depends(get_db),
+):
+    repository = PlaceRepository()
+    return PlaceService(repository)
 
 
 def get_user_service(

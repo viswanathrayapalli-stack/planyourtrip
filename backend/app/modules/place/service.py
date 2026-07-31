@@ -29,6 +29,10 @@ class PlaceService:
     def get_by_destination_id(self, db: Session, destination_id: int) -> list[Place]:
         return self.repository.get_by_destination_id(db, destination_id)
 
+    def get_destination(self, db: Session, place_id: int):
+        place = self.get_by_id(db, place_id)
+        return place.destination
+
     def update(self, db: Session, place_id: int, request: PlaceUpdate) -> Place:
         place = self.get_by_id(db, place_id)
         update_data = request.model_dump(exclude_unset=True)

@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_db, get_place_service
+from app.modules.destination.schemas import DestinationResponse
 from app.modules.place.schemas import (
     PlaceCreate,
     PlaceResponse,
@@ -43,6 +44,18 @@ def get_by_id(
     service: PlaceService = Depends(get_place_service),
 ):
     return service.get_by_id(db, place_id)
+
+
+@router.get(
+    "/{place_id}/destination",
+    response_model=DestinationResponse,
+)
+def get_destination(
+    place_id: int,
+    db: Session = Depends(get_db),
+    service: PlaceService = Depends(get_place_service),
+):
+    return service.get_destination(db, place_id)
 
 
 @router.put("/{place_id}", response_model=PlaceResponse)

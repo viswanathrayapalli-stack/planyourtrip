@@ -1,0 +1,2 @@
+class PlaceService:
+    pass

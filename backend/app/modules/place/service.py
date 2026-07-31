@@ -20,7 +20,12 @@ class PlaceService:
     def get_all(self, db: Session) -> list[Place]:
         return self.repository.get_all(db)
 
-    def update(self, db: Session, place: Place, request: PlaceUpdate) -> Place:
+    def update(self, db: Session, place_id: int, request: PlaceUpdate) -> Place | None:
+        place = self.repository.get_by_id(db, place_id)
+
+        if place is None:
+            return None
+
         update_data = request.model_dump(exclude_unset=True)
 
         for key, value in update_data.items():
@@ -28,5 +33,10 @@ class PlaceService:
 
         return self.repository.update(db, place)
 
-    def delete(self, db: Session, place: Place) -> None:
+    def delete(self, db: Session, place_id: int) -> None:
+        place = self.repository.get_by_id(db, place_id)
+
+        if place is None:
+            return
+
         self.repository.delete(db, place)

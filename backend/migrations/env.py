@@ -13,6 +13,7 @@ from app.modules.trip.models import Trip
 from app.modules.user.models import User
 from app.modules.itinerary.models import Itinerary, ItineraryActivity
 from app.modules.booking.models import Booking
+from app.modules.expense.models import Expense
 
 # Import models here as they are created.
 # Example:

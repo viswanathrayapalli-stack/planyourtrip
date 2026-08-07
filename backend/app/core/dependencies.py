@@ -13,6 +13,8 @@ from app.modules.trip.repository import TripRepository, trip_repository
 from app.modules.trip.service import TripService
 from app.modules.booking.repository import booking_repository
 from app.modules.booking.service import BookingService
+from app.modules.expense.repository import expense_repository
+from app.modules.expense.service import ExpenseService
 from app.modules.user.models import User
 from app.modules.user.repository import UserRepository, user_repository
 from app.modules.user.service import UserService
@@ -48,6 +50,13 @@ def get_trip_service(
 def get_booking_service() -> BookingService:
     return BookingService(
         booking_repository,
+        trip_repository,
+    )
+
+
+def get_expense_service() -> ExpenseService:
+    return ExpenseService(
+        expense_repository,
         trip_repository,
     )
 

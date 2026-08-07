@@ -41,3 +41,8 @@ class Trip(AuditMixin, Base):
         "Booking",
         back_populates="trip",
     )
+    
+    expenses = relationship(
+        "Expense",
+        back_populates="trip",
+    )

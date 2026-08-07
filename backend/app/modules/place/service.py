@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 
+from app.modules.place.constants import PLACE_NOT_FOUND
 from app.modules.place.models import Place
 from app.modules.place.repository import PlaceRepository
 from app.modules.place.schemas import PlaceCreate, PlaceUpdate
@@ -19,7 +20,7 @@ class PlaceService:
         place = self.repository.get_by_id(db, place_id)
 
         if place is None:
-            raise ResourceNotFoundException("Place not found.")
+            raise ResourceNotFoundException(PLACE_NOT_FOUND)
 
         return place
 

@@ -56,3 +56,9 @@ class Trip(AuditMixin, Base):
         "Note",
         back_populates="trip",
     )
+
+    favorites = relationship(
+        "Favorite",
+        back_populates="trip",
+        cascade="all, delete-orphan",
+    )

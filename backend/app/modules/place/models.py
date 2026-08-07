@@ -70,3 +70,8 @@ class Place(AuditMixin, Base):
         "ItineraryActivity",
         back_populates="place",
     )
+
+    favorites = relationship(
+        "Favorite",
+        back_populates="place",
+    )

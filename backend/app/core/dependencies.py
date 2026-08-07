@@ -22,6 +22,8 @@ from app.modules.note.repository import note_repository
 from app.modules.note.service import NoteService
 from app.modules.dashboard.service import DashboardService
 from app.modules.analytics.service import AnalyticsService
+from app.modules.favorite.repository import favorite_repository
+from app.modules.favorite.service import FavoriteService
 from app.modules.recommendation.repository import recommendation_repository
 from app.modules.recommendation.service import RecommendationService
 from app.modules.search.repository import trip_search_repository
@@ -130,6 +132,14 @@ def get_recommendation_service() -> RecommendationService:
     return RecommendationService(
         recommendation_repository,
         DestinationRepository(),
+    )
+
+
+def get_favorite_service() -> FavoriteService:
+    return FavoriteService(
+        favorite_repository,
+        trip_repository,
+        PlaceRepository(),
     )
 
 

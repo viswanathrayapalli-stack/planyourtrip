@@ -16,6 +16,7 @@ from app.modules.booking.models import Booking
 from app.modules.expense.models import Expense
 from app.modules.checklist.models import Checklist
 from app.modules.note.models import Note
+from app.modules.favorite.models import Favorite
 
 # Import models here as they are created.
 # Example:

@@ -22,6 +22,7 @@ from app.modules.note.repository import note_repository
 from app.modules.note.service import NoteService
 from app.modules.dashboard.service import DashboardService
 from app.modules.analytics.service import AnalyticsService
+from app.modules.timeline.service import TimelineService
 from app.modules.user.models import User
 from app.modules.user.repository import UserRepository, user_repository
 from app.modules.user.service import UserService
@@ -101,6 +102,17 @@ def get_analytics_service() -> AnalyticsService:
         checklist_repository,
         note_repository,
         itinerary_repository,
+    )
+
+
+def get_timeline_service() -> TimelineService:
+    return TimelineService(
+        trip_repository,
+        booking_repository,
+        itinerary_repository,
+        expense_repository,
+        checklist_repository,
+        note_repository,
     )
 
 

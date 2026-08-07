@@ -7,6 +7,7 @@ from app.modules.place.api import router as place_router
 from app.modules.trip.api import router as trip_router
 from app.modules.dashboard.api import router as dashboard_router
 from app.modules.analytics.api import router as analytics_router
+from app.modules.timeline.api import router as timeline_router
 from app.modules.booking.api import router as booking_router
 from app.modules.checklist.api import router as checklist_router
 from app.modules.note.api import router as note_router
@@ -21,6 +22,7 @@ api_router.include_router(place_router)
 api_router.include_router(trip_router)
 api_router.include_router(dashboard_router)
 api_router.include_router(analytics_router)
+api_router.include_router(timeline_router)
 api_router.include_router(itinerary_router)
 api_router.include_router(booking_router)
 api_router.include_router(expense_router)

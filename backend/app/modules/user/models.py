@@ -1,5 +1,5 @@
 from sqlalchemy import Boolean, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.shared.database.base import Base
 from app.shared.models import AuditMixin
@@ -31,4 +31,10 @@ class User(Base, AuditMixin):
         Boolean,
         default=True,
         nullable=False,
+    )
+
+    shared_trips = relationship(
+        "TripShare",
+        back_populates="user",
+        cascade="all, delete-orphan",
     )

@@ -29,6 +29,8 @@ from app.modules.recommendation.service import RecommendationService
 from app.modules.search.repository import trip_search_repository
 from app.modules.search.service import TripSearchService
 from app.modules.timeline.service import TimelineService
+from app.modules.trip_share.repository import trip_share_repository
+from app.modules.trip_share.service import TripShareService
 from app.modules.user.models import User
 from app.modules.user.repository import UserRepository, user_repository
 from app.modules.user.service import UserService
@@ -140,6 +142,14 @@ def get_favorite_service() -> FavoriteService:
         favorite_repository,
         trip_repository,
         PlaceRepository(),
+    )
+
+
+def get_trip_share_service() -> TripShareService:
+    return TripShareService(
+        trip_share_repository,
+        trip_repository,
+        UserRepository(),
     )
 
 

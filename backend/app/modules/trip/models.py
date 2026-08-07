@@ -62,3 +62,9 @@ class Trip(AuditMixin, Base):
         back_populates="trip",
         cascade="all, delete-orphan",
     )
+
+    trip_shares = relationship(
+        "TripShare",
+        back_populates="trip",
+        cascade="all, delete-orphan",
+    )

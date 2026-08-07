@@ -17,6 +17,7 @@ from app.modules.expense.models import Expense
 from app.modules.checklist.models import Checklist
 from app.modules.note.models import Note
 from app.modules.favorite.models import Favorite
+from app.modules.trip_share.models import TripShare
 
 # Import models here as they are created.
 # Example:

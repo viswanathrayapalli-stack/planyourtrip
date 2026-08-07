@@ -11,6 +11,7 @@ from app.modules.favorite.api import router as favorite_router
 from app.modules.recommendation.api import router as recommendation_router
 from app.modules.search.api import router as search_router
 from app.modules.timeline.api import router as timeline_router
+from app.modules.trip_share.api import router as trip_share_router
 from app.modules.booking.api import router as booking_router
 from app.modules.checklist.api import router as checklist_router
 from app.modules.note.api import router as note_router
@@ -29,6 +30,7 @@ api_router.include_router(search_router)
 api_router.include_router(recommendation_router)
 api_router.include_router(favorite_router)
 api_router.include_router(timeline_router)
+api_router.include_router(trip_share_router)
 api_router.include_router(itinerary_router)
 api_router.include_router(booking_router)
 api_router.include_router(expense_router)

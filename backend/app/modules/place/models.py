@@ -64,3 +64,8 @@ class Place(AuditMixin, Base):
         "Destination",
         back_populates="places",
     )
+
+    itinerary_activities = relationship(
+        "ItineraryActivity",
+        back_populates="place",
+    )

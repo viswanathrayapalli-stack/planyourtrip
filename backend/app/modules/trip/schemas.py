@@ -20,3 +20,5 @@ class TripResponse(TimestampResponse):
     title: str
     description: str | None
     is_active: bool
+
+    model_config = ConfigDict(from_attributes=True)

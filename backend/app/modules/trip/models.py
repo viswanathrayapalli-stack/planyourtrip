@@ -1,5 +1,5 @@
 from sqlalchemy import Boolean, ForeignKey, Integer, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.shared.database.base import Base
 from app.shared.models import AuditMixin
@@ -30,4 +30,9 @@ class Trip(AuditMixin, Base):
         Boolean,
         default=True,
         nullable=False,
+    )
+
+    itineraries = relationship(
+        "Itinerary",
+        back_populates="trip",
     )

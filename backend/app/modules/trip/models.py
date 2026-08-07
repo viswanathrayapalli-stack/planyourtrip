@@ -68,3 +68,9 @@ class Trip(AuditMixin, Base):
         back_populates="trip",
         cascade="all, delete-orphan",
     )
+
+    attachments = relationship(
+        "Attachment",
+        back_populates="trip",
+        cascade="all, delete-orphan",
+    )

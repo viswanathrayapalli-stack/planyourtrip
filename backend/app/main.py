@@ -6,7 +6,6 @@ from app.shared.exceptions.handlers import register_exception_handlers
 #from app.modules.destination.api import router as destination_router
 from app.api.router import api_router
 
-
 def create_app() -> FastAPI:
     app = FastAPI(
         title=settings.app_name,

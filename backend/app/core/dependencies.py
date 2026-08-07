@@ -31,6 +31,8 @@ from app.modules.search.service import TripSearchService
 from app.modules.timeline.service import TimelineService
 from app.modules.trip_share.repository import trip_share_repository
 from app.modules.trip_share.service import TripShareService
+from app.modules.attachment.repository import attachment_repository
+from app.modules.attachment.service import AttachmentService
 from app.modules.user.models import User
 from app.modules.user.repository import UserRepository, user_repository
 from app.modules.user.service import UserService
@@ -150,6 +152,13 @@ def get_trip_share_service() -> TripShareService:
         trip_share_repository,
         trip_repository,
         UserRepository(),
+    )
+
+
+def get_attachment_service() -> AttachmentService:
+    return AttachmentService(
+        attachment_repository,
+        trip_repository,
     )
 
 

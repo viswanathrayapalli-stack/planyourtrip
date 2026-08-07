@@ -17,8 +17,11 @@ from app.modules.checklist.repository import checklist_repository
 from app.modules.checklist.service import ChecklistService
 from app.modules.expense.repository import expense_repository
 from app.modules.expense.service import ExpenseService
+from app.modules.itinerary.repository import itinerary_repository
 from app.modules.note.repository import note_repository
 from app.modules.note.service import NoteService
+from app.modules.dashboard.service import DashboardService
+from app.modules.analytics.service import AnalyticsService
 from app.modules.user.models import User
 from app.modules.user.repository import UserRepository, user_repository
 from app.modules.user.service import UserService
@@ -76,6 +79,28 @@ def get_note_service() -> NoteService:
     return NoteService(
         note_repository,
         trip_repository,
+    )
+
+
+def get_dashboard_service() -> DashboardService:
+    return DashboardService(
+        trip_repository,
+        booking_repository,
+        expense_repository,
+        checklist_repository,
+        note_repository,
+        itinerary_repository,
+    )
+
+
+def get_analytics_service() -> AnalyticsService:
+    return AnalyticsService(
+        trip_repository,
+        expense_repository,
+        booking_repository,
+        checklist_repository,
+        note_repository,
+        itinerary_repository,
     )
 
 

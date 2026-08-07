@@ -12,6 +12,7 @@ from app.modules.place.models import Place
 from app.modules.trip.models import Trip
 from app.modules.user.models import User
 from app.modules.itinerary.models import Itinerary, ItineraryActivity
+from app.modules.booking.models import Booking
 
 # Import models here as they are created.
 # Example:

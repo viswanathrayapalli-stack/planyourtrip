@@ -9,8 +9,10 @@ from app.modules.destination.service import DestinationService
 from app.modules.identity.constants import UNAUTHORIZED
 from app.modules.place.repository import PlaceRepository
 from app.modules.place.service import PlaceService
-from app.modules.trip.repository import TripRepository
+from app.modules.trip.repository import TripRepository, trip_repository
 from app.modules.trip.service import TripService
+from app.modules.booking.repository import booking_repository
+from app.modules.booking.service import BookingService
 from app.modules.user.models import User
 from app.modules.user.repository import UserRepository, user_repository
 from app.modules.user.service import UserService
@@ -41,6 +43,13 @@ def get_trip_service(
 ):
     repository = TripRepository()
     return TripService(repository)
+
+
+def get_booking_service() -> BookingService:
+    return BookingService(
+        booking_repository,
+        trip_repository,
+    )
 
 
 def get_user_service(

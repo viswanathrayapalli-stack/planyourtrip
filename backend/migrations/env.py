@@ -19,6 +19,7 @@ from app.modules.note.models import Note
 from app.modules.favorite.models import Favorite
 from app.modules.trip_share.models import TripShare
 from app.modules.attachment.models import Attachment
+from app.modules.notification.models import Notification
 
 # Import models here as they are created.
 # Example:

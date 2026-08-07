@@ -38,3 +38,9 @@ class User(Base, AuditMixin):
         back_populates="user",
         cascade="all, delete-orphan",
     )
+
+    notifications = relationship(
+        "Notification",
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )

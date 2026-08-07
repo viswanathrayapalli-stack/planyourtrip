@@ -58,6 +58,7 @@ class Place(AuditMixin, Base):
         Integer,
         ForeignKey("destinations.id"),
         nullable=False,
+        index=True,
     )
 
     destination = relationship(

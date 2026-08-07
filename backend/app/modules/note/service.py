@@ -1,0 +1,86 @@
+from sqlalchemy.orm import Session
+
+from app.modules.note.constants import NOTE_NOT_FOUND
+from app.modules.note.models import Note
+from app.modules.note.repository import NoteRepository
+from app.modules.note.schemas import NoteCreate, NoteUpdate
+from app.modules.trip.repository import TripRepository
+from app.shared.exceptions.exceptions import ResourceNotFoundException
+
+
+class NoteService:
+
+    def __init__(
+        self,
+        repository: NoteRepository,
+        trip_repository: TripRepository,
+    ):
+        self.repository = repository
+        self.trip_repository = trip_repository
+
+    def get_all(
+        self,
+        db: Session,
+    ) -> list[Note]:
+        return self.repository.get_all(db)
+
+    def get_by_id(
+        self,
+        db: Session,
+        note_id: int,
+    ) -> Note:
+        note = self.repository.get_by_id(db, note_id)
+
+        if note is None:
+            raise ResourceNotFoundException(NOTE_NOT_FOUND)
+
+        return note
+
+    def get_by_trip_id(
+        self,
+        db: Session,
+        trip_id: int,
+    ) -> list[Note]:
+        trip = self.trip_repository.get_by_id(db, trip_id)
+
+        if trip is None:
+            raise ResourceNotFoundException("Trip not found.")
+
+        return self.repository.get_by_trip_id(db, trip_id)
+
+    def create(
+        self,
+        db: Session,
+        request: NoteCreate,
+    ) -> Note:
+        trip = self.trip_repository.get_by_id(db, request.trip_id)
+
+        if trip is None:
+            raise ResourceNotFoundException("Trip not found.")
+
+        note = Note(**request.model_dump())
+
+        return self.repository.create(db, note)
+
+    def update(
+        self,
+        db: Session,
+        note_id: int,
+        request: NoteUpdate,
+    ) -> Note:
+        note = self.get_by_id(db, note_id)
+        update_data = request.model_dump(exclude_unset=True)
+
+
+        for key, value in update_data.items():
+            setattr(note, key, value)
+
+        return self.repository.update(db, note)
+
+    def delete(
+        self,
+        db: Session,
+        note_id: int,
+    ) -> None:
+        note = self.get_by_id(db, note_id)
+        self.repository.delete(db, note)

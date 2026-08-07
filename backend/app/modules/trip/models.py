@@ -51,3 +51,8 @@ class Trip(AuditMixin, Base):
         "Checklist",
         back_populates="trip",
     )
+
+    notes = relationship(
+        "Note",
+        back_populates="trip",
+    )

@@ -22,6 +22,8 @@ from app.modules.note.repository import note_repository
 from app.modules.note.service import NoteService
 from app.modules.dashboard.service import DashboardService
 from app.modules.analytics.service import AnalyticsService
+from app.modules.recommendation.repository import recommendation_repository
+from app.modules.recommendation.service import RecommendationService
 from app.modules.search.repository import trip_search_repository
 from app.modules.search.service import TripSearchService
 from app.modules.timeline.service import TimelineService
@@ -121,6 +123,13 @@ def get_timeline_service() -> TimelineService:
 def get_trip_search_service() -> TripSearchService:
     return TripSearchService(
         trip_search_repository,
+    )
+
+
+def get_recommendation_service() -> RecommendationService:
+    return RecommendationService(
+        recommendation_repository,
+        DestinationRepository(),
     )
 
 

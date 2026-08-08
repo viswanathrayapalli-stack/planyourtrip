@@ -4,7 +4,9 @@ from jose import JWTError
 from sqlalchemy.orm import Session
 
 from app.core.security import decode_access_token
+from app.core.settings import settings
 from app.ai.providers import AIProvider, OpenAIProvider
+from app.ai.providers.mock_provider import MockAIProvider
 from app.ai.services import ItineraryAIService
 from app.modules.destination.repository import DestinationRepository
 from app.modules.destination.service import DestinationService
@@ -192,6 +194,9 @@ def get_email_service() -> EmailService:
 
 
 def get_ai_provider() -> AIProvider:
+    if settings.AI_PROVIDER == "mock":
+        return MockAIProvider()
+
     return OpenAIProvider()
 
 

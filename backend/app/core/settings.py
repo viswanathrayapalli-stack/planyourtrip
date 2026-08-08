@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     # AI Configuration
     # ==========================
     AI_ENABLED: bool = True
+    AI_PROVIDER: str = "openai"
     OPENAI_API_KEY: str = ""
     OPENAI_MODEL: str = "gpt-5.6-luna"
     OPENAI_BASE_URL: str | None = None

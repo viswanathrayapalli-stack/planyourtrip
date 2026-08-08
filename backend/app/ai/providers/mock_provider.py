@@ -1,0 +1,47 @@
+from app.ai.providers.ai_provider import AIProvider
+
+
+class MockAIProvider(AIProvider):
+    """Local development/testing AI provider with deterministic output."""
+
+    def generate(self, prompt: str) -> str:
+        return (
+            "Day 1 - Arrival and City Orientation\n"
+            "Activities:\n"
+            "- Check in and settle at your hotel.\n"
+            "- Take a guided walking tour of the historic center.\n"
+            "- Visit a landmark viewpoint for sunset photos.\n"
+            "Meals:\n"
+            "- Breakfast: Cafe pastry and coffee near your hotel.\n"
+            "- Lunch: Local casual restaurant with regional dishes.\n"
+            "- Dinner: Traditional restaurant in the old town.\n"
+            "Travel tips:\n"
+            "- Carry small cash for local transit and markets.\n"
+            "- Keep your first day light to recover from travel.\n"
+            "\n"
+            "Day 2 - Culture, Neighborhoods, and Food\n"
+            "Activities:\n"
+            "- Visit a major museum in the morning.\n"
+            "- Explore a neighborhood market and artisan streets.\n"
+            "- Join an evening food walk for local specialties.\n"
+            "Meals:\n"
+            "- Breakfast: Hotel breakfast or nearby bakery.\n"
+            "- Lunch: Street food and market snacks.\n"
+            "- Dinner: Food tour tasting menu.\n"
+            "Travel tips:\n"
+            "- Book museum tickets in advance to skip queues.\n"
+            "- Use a refillable water bottle and stay hydrated.\n"
+            "\n"
+            "Day 3 - Nature and Relaxed Exploration\n"
+            "Activities:\n"
+            "- Morning park or waterfront walk.\n"
+            "- Optional half-day excursion to a nearby scenic spot.\n"
+            "- Free time for shopping and packing.\n"
+            "Meals:\n"
+            "- Breakfast: Light breakfast before heading out.\n"
+            "- Lunch: Picnic or cafe with a view.\n"
+            "- Dinner: Farewell dinner at a highly rated bistro.\n"
+            "Travel tips:\n"
+            "- Confirm return transport details the night before departure.\n"
+            "- Leave buffer time for airport or station transfers."
+        )

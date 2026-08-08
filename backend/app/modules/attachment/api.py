@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends, Response, status
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, File, Form, Response, UploadFile, status
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import (
@@ -41,11 +43,19 @@ def get_attachments(
     response_model=AttachmentResponse,
 )
 def create_attachment(
-    request: AttachmentCreate,
+    trip_id: Annotated[int, Form(...)],
+    category: Annotated[str, Form(...)],
+    file: Annotated[UploadFile, File(...)],
     db: Session = Depends(get_db),
     service: AttachmentService = Depends(get_attachment_service),
     current_user: User = Depends(get_current_user),
 ):
+    request = AttachmentCreate(
+        trip_id=trip_id,
+        category=category,
+        file=file,
+    )
+
     return service.create(
         db=db,
         request=request,

@@ -41,6 +41,8 @@ from app.modules.user.service import UserService
 from app.shared.authorization import AuthorizationService
 from app.shared.database.session import get_db
 from app.shared.exceptions.exceptions import AuthenticationException
+from app.shared.storage.file_validator import FileValidator
+from app.shared.storage.local_storage import LocalStorageService
 
 
 def get_place_service(
@@ -196,6 +198,8 @@ def get_attachment_service(
         attachment_repository,
         trip_repository,
         authorization_service,
+        LocalStorageService(),
+        FileValidator(),
     )
 
 

@@ -4,6 +4,7 @@ from jose import JWTError
 from sqlalchemy.orm import Session
 
 from app.core.security import decode_access_token
+from app.core.health import HealthService
 from app.core.settings import settings
 from app.ai.providers import AIProvider, OpenAIProvider
 from app.ai.providers.mock_provider import MockAIProvider
@@ -49,6 +50,9 @@ from app.shared.exceptions.exceptions import AuthenticationException
 from app.shared.storage.file_validator import FileValidator
 from app.shared.storage.local_storage import LocalStorageService
 from app.shared.storage.storage_service import StorageService
+
+
+health_service = HealthService(settings)
 
 
 def get_place_service(
@@ -191,6 +195,10 @@ def get_favorite_service(
 
 def get_email_service() -> EmailService:
     return EmailService()
+
+
+def get_health_service() -> HealthService:
+    return health_service
 
 
 def get_ai_provider() -> AIProvider:

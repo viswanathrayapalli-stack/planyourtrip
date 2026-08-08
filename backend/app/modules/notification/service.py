@@ -4,6 +4,7 @@ from app.modules.notification.repository import NotificationRepository
 from app.modules.notification.schemas import NotificationCreate, NotificationResponse
 from app.modules.user.repository import UserRepository
 from app.shared.exceptions.exceptions import ResourceNotFoundException
+from app.shared.pagination import PageResponse, PaginationParams
 
 
 class NotificationService:
@@ -44,6 +45,34 @@ class NotificationService:
             )
 
         return response
+
+    def get_by_user_id_paginated(
+        self,
+        db: Session,
+        user_id: int,
+        pagination: PaginationParams,
+    ) -> PageResponse[NotificationResponse]:
+        user = self.user_repository.get_by_id(db, user_id)
+
+        if user is None:
+            raise ResourceNotFoundException("User not found.")
+
+        page = self.repository.get_by_user_id_paginated(
+            db=db,
+            user_id=user_id,
+            pagination=pagination,
+        )
+
+        return PageResponse(
+            items=[
+                NotificationResponse.model_validate(item)
+                for item in page.items
+            ],
+            total=page.total,
+            page=page.page,
+            page_size=page.page_size,
+            total_pages=page.total_pages,
+        )
 
     def create(
         self,

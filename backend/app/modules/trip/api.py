@@ -9,20 +9,26 @@ from app.modules.trip.schemas import (
 )
 from app.modules.trip.service import TripService
 from app.modules.user.models import User
+from app.shared.pagination import PageResponse, PaginationParams
 
 router = APIRouter(prefix="/trips", tags=["Trips"])
 
 
 @router.get(
     "",
-    response_model=list[TripResponse],
+    response_model=PageResponse[TripResponse],
 )
 def get_all(
     db: Session = Depends(get_db),
     service: TripService = Depends(get_trip_service),
     current_user: User = Depends(get_current_user),
+    pagination: PaginationParams = Depends(),
 ):
-    return service.get_all(db, current_user.id)
+    return service.get_all_paginated(
+        db=db,
+        user_id=current_user.id,
+        pagination=pagination,
+    )
 
 
 @router.get(

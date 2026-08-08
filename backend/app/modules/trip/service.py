@@ -2,8 +2,9 @@ from sqlalchemy.orm import Session
 
 from app.modules.trip.models import Trip
 from app.modules.trip.repository import TripRepository
-from app.modules.trip.schemas import TripCreate, TripUpdate
+from app.modules.trip.schemas import TripCreate, TripResponse, TripUpdate
 from app.shared.authorization import AuthorizationService
+from app.shared.pagination import PageResponse, PaginationParams
 
 
 class TripService:
@@ -22,6 +23,26 @@ class TripService:
         user_id: int,
     ) -> list[Trip]:
         return self.repository.get_all_by_user(db, user_id)
+
+    def get_all_paginated(
+        self,
+        db: Session,
+        user_id: int,
+        pagination: PaginationParams,
+    ) -> PageResponse[TripResponse]:
+        page = self.repository.get_all_by_user_paginated(
+            db=db,
+            user_id=user_id,
+            pagination=pagination,
+        )
+
+        return PageResponse(
+            items=[TripResponse.model_validate(trip) for trip in page.items],
+            total=page.total,
+            page=page.page,
+            page_size=page.page_size,
+            total_pages=page.total_pages,
+        )
 
     def get_by_id(
         self,

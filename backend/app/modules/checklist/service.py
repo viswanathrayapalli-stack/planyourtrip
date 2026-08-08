@@ -3,10 +3,15 @@ from sqlalchemy.orm import Session
 from app.modules.checklist.constants import CHECKLIST_NOT_FOUND
 from app.modules.checklist.models import Checklist
 from app.modules.checklist.repository import ChecklistRepository
-from app.modules.checklist.schemas import ChecklistCreate, ChecklistUpdate
+from app.modules.checklist.schemas import (
+    ChecklistCreate,
+    ChecklistResponse,
+    ChecklistUpdate,
+)
 from app.shared.authorization import AuthorizationService
 from app.modules.trip.repository import TripRepository
 from app.shared.exceptions.exceptions import ResourceNotFoundException
+from app.shared.pagination import PageResponse, PaginationParams
 
 
 class ChecklistService:
@@ -59,6 +64,36 @@ class ChecklistService:
         )
 
         return self.repository.get_by_trip_id(db, trip_id)
+
+    def get_by_trip_id_paginated(
+        self,
+        db: Session,
+        trip_id: int,
+        user_id: int,
+        pagination: PaginationParams,
+    ) -> PageResponse[ChecklistResponse]:
+        self.authorization_service.ensure_trip_owner(
+            db=db,
+            trip_id=trip_id,
+            current_user_id=user_id,
+        )
+
+        page = self.repository.get_by_trip_id_paginated(
+            db=db,
+            trip_id=trip_id,
+            pagination=pagination,
+        )
+
+        return PageResponse(
+            items=[
+                ChecklistResponse.model_validate(item)
+                for item in page.items
+            ],
+            total=page.total,
+            page=page.page,
+            page_size=page.page_size,
+            total_pages=page.total_pages,
+        )
 
     def create(
         self,

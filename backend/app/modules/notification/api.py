@@ -7,20 +7,26 @@ from app.modules.notification.schemas import (
     NotificationResponse,
 )
 from app.modules.notification.service import NotificationService
+from app.shared.pagination import PageResponse, PaginationParams
 
 router = APIRouter(prefix="/notifications", tags=["Notifications"])
 
 
 @router.get(
     "/users/{user_id}",
-    response_model=list[NotificationResponse],
+    response_model=PageResponse[NotificationResponse],
 )
 def get_notifications(
     user_id: int,
     db: Session = Depends(get_db),
     service: NotificationService = Depends(get_notification_service),
+    pagination: PaginationParams = Depends(),
 ):
-    return service.get_by_user_id(db, user_id)
+    return service.get_by_user_id_paginated(
+        db=db,
+        user_id=user_id,
+        pagination=pagination,
+    )
 
 
 @router.post(

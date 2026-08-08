@@ -2,6 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.modules.notification.models import Notification
+from app.shared.pagination import PageResponse, PaginationParams
 from app.shared.repositories.base_repository import BaseRepository
 
 
@@ -21,6 +22,23 @@ class NotificationRepository(BaseRepository[Notification]):
             .order_by(Notification.created_at.desc())
         )
         return list(db.scalars(stmt).all())
+
+    def get_by_user_id_paginated(
+        self,
+        db: Session,
+        user_id: int,
+        pagination: PaginationParams,
+    ) -> PageResponse[Notification]:
+        stmt = (
+            select(Notification)
+            .where(Notification.user_id == user_id)
+            .order_by(Notification.created_at.desc())
+        )
+        return self.paginate(
+            db=db,
+            stmt=stmt,
+            pagination=pagination,
+        )
 
 
 notification_repository = NotificationRepository()

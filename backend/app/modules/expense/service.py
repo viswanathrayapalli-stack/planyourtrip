@@ -3,10 +3,11 @@ from sqlalchemy.orm import Session
 from app.modules.expense.constants import EXPENSE_NOT_FOUND
 from app.modules.expense.models import Expense
 from app.modules.expense.repository import ExpenseRepository
-from app.modules.expense.schemas import ExpenseCreate, ExpenseUpdate
+from app.modules.expense.schemas import ExpenseCreate, ExpenseResponse, ExpenseUpdate
 from app.shared.authorization import AuthorizationService
 from app.modules.trip.repository import TripRepository
 from app.shared.exceptions.exceptions import ResourceNotFoundException
+from app.shared.pagination import PageResponse, PaginationParams
 
 
 class ExpenseService:
@@ -59,6 +60,33 @@ class ExpenseService:
         )
 
         return self.repository.get_by_trip_id(db, trip_id)
+
+    def get_by_trip_id_paginated(
+        self,
+        db: Session,
+        trip_id: int,
+        user_id: int,
+        pagination: PaginationParams,
+    ) -> PageResponse[ExpenseResponse]:
+        self.authorization_service.ensure_trip_owner(
+            db=db,
+            trip_id=trip_id,
+            current_user_id=user_id,
+        )
+
+        page = self.repository.get_by_trip_id_paginated(
+            db=db,
+            trip_id=trip_id,
+            pagination=pagination,
+        )
+
+        return PageResponse(
+            items=[ExpenseResponse.model_validate(expense) for expense in page.items],
+            total=page.total,
+            page=page.page,
+            page_size=page.page_size,
+            total_pages=page.total_pages,
+        )
 
     def create(
         self,

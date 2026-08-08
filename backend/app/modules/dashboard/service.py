@@ -13,7 +13,7 @@ from app.modules.dashboard.schemas import (
     DashboardStatistics,
     TripSummary,
 )
-from app.shared.exceptions.exceptions import ResourceNotFoundException
+from app.shared.authorization import AuthorizationService
 
 
 class DashboardService:
@@ -26,6 +26,7 @@ class DashboardService:
         checklist_repository: ChecklistRepository,
         note_repository: NoteRepository,
         itinerary_repository: ItineraryRepository,
+        authorization_service: AuthorizationService,
     ):
         self.trip_repository = trip_repository
         self.booking_repository = booking_repository
@@ -33,16 +34,19 @@ class DashboardService:
         self.checklist_repository = checklist_repository
         self.note_repository = note_repository
         self.itinerary_repository = itinerary_repository
+        self.authorization_service = authorization_service
 
     def get_dashboard(
         self,
         db: Session,
         trip_id: int,
+        user_id: int,
     ) -> DashboardResponse:
-        trip = self.trip_repository.get_by_id(db, trip_id)
-
-        if trip is None:
-            raise ResourceNotFoundException("Trip not found.")
+        trip = self.authorization_service.ensure_trip_owner(
+            db=db,
+            trip_id=trip_id,
+            current_user_id=user_id,
+        )
 
         bookings = self.booking_repository.get_by_trip_id(db, trip_id)
         expenses = self.expense_repository.get_by_trip_id(db, trip_id)

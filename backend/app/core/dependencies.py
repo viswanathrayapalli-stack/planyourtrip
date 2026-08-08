@@ -38,6 +38,7 @@ from app.modules.notification.service import NotificationService
 from app.modules.user.models import User
 from app.modules.user.repository import UserRepository, user_repository
 from app.modules.user.service import UserService
+from app.shared.authorization import AuthorizationService
 from app.shared.database.session import get_db
 from app.shared.exceptions.exceptions import AuthenticationException
 
@@ -60,42 +61,63 @@ def get_destination_service(
     )
 
 
+def get_authorization_service() -> AuthorizationService:
+    return AuthorizationService(
+        trip_repository,
+    )
+
+
 def get_trip_service(
     db: Session = Depends(get_db),
+    authorization_service: AuthorizationService = Depends(get_authorization_service),
 ):
     repository = TripRepository()
-    return TripService(repository)
+    return TripService(repository, authorization_service)
 
 
-def get_booking_service() -> BookingService:
+def get_booking_service(
+    authorization_service: AuthorizationService = Depends(get_authorization_service),
+) -> BookingService:
     return BookingService(
         booking_repository,
         trip_repository,
+        authorization_service,
     )
 
 
-def get_expense_service() -> ExpenseService:
+def get_expense_service(
+    authorization_service: AuthorizationService = Depends(get_authorization_service),
+) -> ExpenseService:
     return ExpenseService(
         expense_repository,
         trip_repository,
+        authorization_service,
     )
 
 
-def get_checklist_service() -> ChecklistService:
+def get_checklist_service(
+    authorization_service: AuthorizationService = Depends(get_authorization_service),
+) -> ChecklistService:
     return ChecklistService(
         checklist_repository,
         trip_repository,
+        authorization_service,
     )
 
 
-def get_note_service() -> NoteService:
+def get_note_service(
+    authorization_service: AuthorizationService = Depends(get_authorization_service),
+) -> NoteService:
     return NoteService(
         note_repository,
         trip_repository,
+        authorization_service,
     )
 
 
-def get_dashboard_service() -> DashboardService:
+def get_dashboard_service(
+    authorization_service: AuthorizationService = Depends(get_authorization_service),
+) -> DashboardService:
     return DashboardService(
         trip_repository,
         booking_repository,
@@ -103,10 +125,13 @@ def get_dashboard_service() -> DashboardService:
         checklist_repository,
         note_repository,
         itinerary_repository,
+        authorization_service,
     )
 
 
-def get_analytics_service() -> AnalyticsService:
+def get_analytics_service(
+    authorization_service: AuthorizationService = Depends(get_authorization_service),
+) -> AnalyticsService:
     return AnalyticsService(
         trip_repository,
         expense_repository,
@@ -114,10 +139,13 @@ def get_analytics_service() -> AnalyticsService:
         checklist_repository,
         note_repository,
         itinerary_repository,
+        authorization_service,
     )
 
 
-def get_timeline_service() -> TimelineService:
+def get_timeline_service(
+    authorization_service: AuthorizationService = Depends(get_authorization_service),
+) -> TimelineService:
     return TimelineService(
         trip_repository,
         booking_repository,
@@ -125,6 +153,7 @@ def get_timeline_service() -> TimelineService:
         expense_repository,
         checklist_repository,
         note_repository,
+        authorization_service,
     )
 
 
@@ -141,11 +170,14 @@ def get_recommendation_service() -> RecommendationService:
     )
 
 
-def get_favorite_service() -> FavoriteService:
+def get_favorite_service(
+    authorization_service: AuthorizationService = Depends(get_authorization_service),
+) -> FavoriteService:
     return FavoriteService(
         favorite_repository,
         trip_repository,
         PlaceRepository(),
+        authorization_service,
     )
 
 
@@ -157,10 +189,13 @@ def get_trip_share_service() -> TripShareService:
     )
 
 
-def get_attachment_service() -> AttachmentService:
+def get_attachment_service(
+    authorization_service: AuthorizationService = Depends(get_authorization_service),
+) -> AttachmentService:
     return AttachmentService(
         attachment_repository,
         trip_repository,
+        authorization_service,
     )
 
 

@@ -7,8 +7,7 @@ from app.modules.itinerary.repository import ItineraryRepository
 from app.modules.note.repository import NoteRepository
 from app.modules.timeline.schemas import TimelineEvent, TimelineResponse
 from app.modules.trip.repository import TripRepository
-from app.modules.trip.constants import TRIP_NOT_FOUND
-from app.shared.exceptions.exceptions import ResourceNotFoundException
+from app.shared.authorization import AuthorizationService
 
 
 class TimelineService:
@@ -21,6 +20,7 @@ class TimelineService:
         expense_repository: ExpenseRepository,
         checklist_repository: ChecklistRepository,
         note_repository: NoteRepository,
+        authorization_service: AuthorizationService,
     ):
         self.trip_repository = trip_repository
         self.booking_repository = booking_repository
@@ -28,16 +28,19 @@ class TimelineService:
         self.expense_repository = expense_repository
         self.checklist_repository = checklist_repository
         self.note_repository = note_repository
+        self.authorization_service = authorization_service
 
     def get_timeline(
         self,
         db: Session,
         trip_id: int,
+        user_id: int,
     ) -> TimelineResponse:
-        trip = self.trip_repository.get_by_id(db, trip_id)
-
-        if trip is None:
-            raise ResourceNotFoundException(TRIP_NOT_FOUND)
+        trip = self.authorization_service.ensure_trip_owner(
+            db=db,
+            trip_id=trip_id,
+            current_user_id=user_id,
+        )
 
         bookings = self.booking_repository.get_by_trip_id(db, trip_id)
         itineraries = self.itinerary_repository.get_by_trip_id(db, trip_id)

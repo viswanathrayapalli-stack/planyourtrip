@@ -4,6 +4,7 @@ from app.modules.expense.constants import EXPENSE_NOT_FOUND
 from app.modules.expense.models import Expense
 from app.modules.expense.repository import ExpenseRepository
 from app.modules.expense.schemas import ExpenseCreate, ExpenseUpdate
+from app.shared.authorization import AuthorizationService
 from app.modules.trip.repository import TripRepository
 from app.shared.exceptions.exceptions import ResourceNotFoundException
 
@@ -14,9 +15,11 @@ class ExpenseService:
         self,
         repository: ExpenseRepository,
         trip_repository: TripRepository,
+        authorization_service: AuthorizationService,
     ):
         self.repository = repository
         self.trip_repository = trip_repository
+        self.authorization_service = authorization_service
 
     def get_all(
         self,
@@ -28,11 +31,18 @@ class ExpenseService:
         self,
         db: Session,
         expense_id: int,
+        user_id: int,
     ) -> Expense:
         expense = self.repository.get_by_id(db, expense_id)
 
         if expense is None:
             raise ResourceNotFoundException(EXPENSE_NOT_FOUND)
+
+        self.authorization_service.ensure_trip_owner(
+            db=db,
+            trip_id=expense.trip_id,
+            current_user_id=user_id,
+        )
 
         return expense
 
@@ -40,11 +50,13 @@ class ExpenseService:
         self,
         db: Session,
         trip_id: int,
+        user_id: int,
     ) -> list[Expense]:
-        trip = self.trip_repository.get_by_id(db, trip_id)
-
-        if trip is None:
-            raise ResourceNotFoundException("Trip not found.")
+        self.authorization_service.ensure_trip_owner(
+            db=db,
+            trip_id=trip_id,
+            current_user_id=user_id,
+        )
 
         return self.repository.get_by_trip_id(db, trip_id)
 
@@ -52,11 +64,13 @@ class ExpenseService:
         self,
         db: Session,
         request: ExpenseCreate,
+        user_id: int,
     ) -> Expense:
-        trip = self.trip_repository.get_by_id(db, request.trip_id)
-
-        if trip is None:
-            raise ResourceNotFoundException("Trip not found.")
+        self.authorization_service.ensure_trip_owner(
+            db=db,
+            trip_id=request.trip_id,
+            current_user_id=user_id,
+        )
 
         expense = Expense(**request.model_dump())
 
@@ -67,8 +81,9 @@ class ExpenseService:
         db: Session,
         expense_id: int,
         request: ExpenseUpdate,
+        user_id: int,
     ) -> Expense:
-        expense = self.get_by_id(db, expense_id)
+        expense = self.get_by_id(db, expense_id, user_id)
         update_data = request.model_dump(exclude_unset=True)
 
 
@@ -82,6 +97,7 @@ class ExpenseService:
         self,
         db: Session,
         expense_id: int,
+        user_id: int,
     ) -> None:
-        expense = self.get_by_id(db, expense_id)
+        expense = self.get_by_id(db, expense_id, user_id)
         self.repository.delete(db, expense)

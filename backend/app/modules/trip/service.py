@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from app.modules.trip.models import Trip
 from app.modules.trip.repository import TripRepository
 from app.modules.trip.schemas import TripCreate, TripUpdate
-from app.shared.exceptions.exceptions import ResourceNotFoundException
+from app.shared.authorization import AuthorizationService
 
 
 class TripService:
@@ -11,8 +11,10 @@ class TripService:
     def __init__(
         self,
         repository: TripRepository,
+        authorization_service: AuthorizationService,
     ):
         self.repository = repository
+        self.authorization_service = authorization_service
 
     def get_all(
         self,
@@ -27,13 +29,11 @@ class TripService:
         trip_id: int,
         user_id: int,
     ) -> Trip:
-
-        trip = self.repository.get_by_id_and_user(db, trip_id, user_id)
-
-        if trip is None:
-            raise ResourceNotFoundException("Trip not found.")
-
-        return trip
+        return self.authorization_service.ensure_trip_owner(
+            db=db,
+            trip_id=trip_id,
+            current_user_id=user_id,
+        )
 
     def create(
         self,

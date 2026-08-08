@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 
 from app.modules.attachment.repository import AttachmentRepository
 from app.modules.attachment.schemas import AttachmentCreate, AttachmentResponse
+from app.shared.authorization import AuthorizationService
 from app.modules.trip.constants import TRIP_NOT_FOUND
 from app.modules.trip.repository import TripRepository
 from app.shared.exceptions.exceptions import ResourceNotFoundException
@@ -13,19 +14,23 @@ class AttachmentService:
         self,
         repository: AttachmentRepository,
         trip_repository: TripRepository,
+        authorization_service: AuthorizationService,
     ):
         self.repository = repository
         self.trip_repository = trip_repository
+        self.authorization_service = authorization_service
 
     def get_by_trip_id(
         self,
         db: Session,
         trip_id: int,
+        user_id: int,
     ) -> list[AttachmentResponse]:
-        trip = self.trip_repository.get_by_id(db, trip_id)
-
-        if trip is None:
-            raise ResourceNotFoundException(TRIP_NOT_FOUND)
+        self.authorization_service.ensure_trip_owner(
+            db=db,
+            trip_id=trip_id,
+            current_user_id=user_id,
+        )
 
         attachments = self.repository.get_by_trip_id(db, trip_id)
 
@@ -52,11 +57,13 @@ class AttachmentService:
         self,
         db: Session,
         request: AttachmentCreate,
+        user_id: int,
     ) -> AttachmentResponse:
-        trip = self.trip_repository.get_by_id(db, request.trip_id)
-
-        if trip is None:
-            raise ResourceNotFoundException(TRIP_NOT_FOUND)
+        self.authorization_service.ensure_trip_owner(
+            db=db,
+            trip_id=request.trip_id,
+            current_user_id=user_id,
+        )
 
         attachment = self.repository.model(**request.model_dump())
         attachment = self.repository.create(db, attachment)
@@ -77,10 +84,17 @@ class AttachmentService:
         self,
         db: Session,
         attachment_id: int,
+        user_id: int,
     ) -> None:
         attachment = self.repository.get_by_id(db, attachment_id)
 
         if attachment is None:
             raise ResourceNotFoundException("Attachment not found.")
+
+        self.authorization_service.ensure_trip_owner(
+            db=db,
+            trip_id=attachment.trip_id,
+            current_user_id=user_id,
+        )
 
         self.repository.delete(db, attachment)

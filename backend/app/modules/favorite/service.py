@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.modules.favorite.repository import FavoriteRepository
 from app.modules.favorite.schemas import FavoriteCreate, FavoriteResponse
 from app.modules.place.repository import PlaceRepository
+from app.shared.authorization import AuthorizationService
 from app.modules.trip.constants import TRIP_NOT_FOUND
 from app.modules.trip.repository import TripRepository
 from app.shared.exceptions.exceptions import ResourceNotFoundException, ValidationException
@@ -15,20 +16,24 @@ class FavoriteService:
         repository: FavoriteRepository,
         trip_repository: TripRepository,
         place_repository: PlaceRepository,
+        authorization_service: AuthorizationService,
     ):
         self.repository = repository
         self.trip_repository = trip_repository
         self.place_repository = place_repository
+        self.authorization_service = authorization_service
 
     def get_by_trip_id(
         self,
         db: Session,
         trip_id: int,
+        user_id: int,
     ) -> list[FavoriteResponse]:
-        trip = self.trip_repository.get_by_id(db, trip_id)
-
-        if trip is None:
-            raise ResourceNotFoundException(TRIP_NOT_FOUND)
+        self.authorization_service.ensure_trip_owner(
+            db=db,
+            trip_id=trip_id,
+            current_user_id=user_id,
+        )
 
         favorites = self.repository.get_by_trip_id(db, trip_id)
 
@@ -59,11 +64,13 @@ class FavoriteService:
         self,
         db: Session,
         request: FavoriteCreate,
+        user_id: int,
     ) -> FavoriteResponse:
-        trip = self.trip_repository.get_by_id(db, request.trip_id)
-
-        if trip is None:
-            raise ResourceNotFoundException(TRIP_NOT_FOUND)
+        self.authorization_service.ensure_trip_owner(
+            db=db,
+            trip_id=request.trip_id,
+            current_user_id=user_id,
+        )
 
         place = self.place_repository.get_by_id(db, request.place_id)
 
@@ -97,10 +104,17 @@ class FavoriteService:
         self,
         db: Session,
         favorite_id: int,
+        user_id: int,
     ) -> None:
         favorite = self.repository.get_by_id(db, favorite_id)
 
         if favorite is None:
             raise ResourceNotFoundException("Favorite not found.")
+
+        self.authorization_service.ensure_trip_owner(
+            db=db,
+            trip_id=favorite.trip_id,
+            current_user_id=user_id,
+        )
 
         self.repository.delete(db, favorite)

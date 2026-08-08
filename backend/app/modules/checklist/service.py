@@ -4,6 +4,7 @@ from app.modules.checklist.constants import CHECKLIST_NOT_FOUND
 from app.modules.checklist.models import Checklist
 from app.modules.checklist.repository import ChecklistRepository
 from app.modules.checklist.schemas import ChecklistCreate, ChecklistUpdate
+from app.shared.authorization import AuthorizationService
 from app.modules.trip.repository import TripRepository
 from app.shared.exceptions.exceptions import ResourceNotFoundException
 
@@ -14,9 +15,11 @@ class ChecklistService:
         self,
         repository: ChecklistRepository,
         trip_repository: TripRepository,
+        authorization_service: AuthorizationService,
     ):
         self.repository = repository
         self.trip_repository = trip_repository
+        self.authorization_service = authorization_service
 
     def get_all(
         self,
@@ -28,11 +31,18 @@ class ChecklistService:
         self,
         db: Session,
         checklist_id: int,
+        user_id: int,
     ) -> Checklist:
         checklist = self.repository.get_by_id(db, checklist_id)
 
         if checklist is None:
             raise ResourceNotFoundException(CHECKLIST_NOT_FOUND)
+
+        self.authorization_service.ensure_trip_owner(
+            db=db,
+            trip_id=checklist.trip_id,
+            current_user_id=user_id,
+        )
 
         return checklist
 
@@ -40,11 +50,13 @@ class ChecklistService:
         self,
         db: Session,
         trip_id: int,
+        user_id: int,
     ) -> list[Checklist]:
-        trip = self.trip_repository.get_by_id(db, trip_id)
-
-        if trip is None:
-            raise ResourceNotFoundException("Trip not found.")
+        self.authorization_service.ensure_trip_owner(
+            db=db,
+            trip_id=trip_id,
+            current_user_id=user_id,
+        )
 
         return self.repository.get_by_trip_id(db, trip_id)
 
@@ -52,11 +64,13 @@ class ChecklistService:
         self,
         db: Session,
         request: ChecklistCreate,
+        user_id: int,
     ) -> Checklist:
-        trip = self.trip_repository.get_by_id(db, request.trip_id)
-
-        if trip is None:
-            raise ResourceNotFoundException("Trip not found.")
+        self.authorization_service.ensure_trip_owner(
+            db=db,
+            trip_id=request.trip_id,
+            current_user_id=user_id,
+        )
 
         checklist = Checklist(**request.model_dump())
 
@@ -67,8 +81,9 @@ class ChecklistService:
         db: Session,
         checklist_id: int,
         request: ChecklistUpdate,
+        user_id: int,
     ) -> Checklist:
-        checklist = self.get_by_id(db, checklist_id)
+        checklist = self.get_by_id(db, checklist_id, user_id)
         update_data = request.model_dump(exclude_unset=True)
 
 
@@ -81,6 +96,7 @@ class ChecklistService:
         self,
         db: Session,
         checklist_id: int,
+        user_id: int,
     ) -> None:
-        checklist = self.get_by_id(db, checklist_id)
+        checklist = self.get_by_id(db, checklist_id, user_id)
         self.repository.delete(db, checklist)

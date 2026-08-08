@@ -18,8 +18,7 @@ from app.modules.expense.repository import ExpenseRepository
 from app.modules.itinerary.repository import ItineraryRepository
 from app.modules.note.repository import NoteRepository
 from app.modules.trip.repository import TripRepository
-from app.modules.trip.constants import TRIP_NOT_FOUND
-from app.shared.exceptions.exceptions import ResourceNotFoundException
+from app.shared.authorization import AuthorizationService
 
 
 class AnalyticsService:
@@ -32,6 +31,7 @@ class AnalyticsService:
         checklist_repository: ChecklistRepository,
         note_repository: NoteRepository,
         itinerary_repository: ItineraryRepository,
+        authorization_service: AuthorizationService,
     ):
         self.trip_repository = trip_repository
         self.expense_repository = expense_repository
@@ -39,16 +39,19 @@ class AnalyticsService:
         self.checklist_repository = checklist_repository
         self.note_repository = note_repository
         self.itinerary_repository = itinerary_repository
+        self.authorization_service = authorization_service
 
     def get_budget_summary(
         self,
         db: Session,
         trip_id: int,
+        user_id: int,
     ) -> BudgetSummaryResponse:
-        trip = self.trip_repository.get_by_id(db, trip_id)
-
-        if trip is None:
-            raise ResourceNotFoundException(TRIP_NOT_FOUND)
+        trip = self.authorization_service.ensure_trip_owner(
+            db=db,
+            trip_id=trip_id,
+            current_user_id=user_id,
+        )
 
         expenses = self.expense_repository.get_by_trip_id(db, trip_id)
 
@@ -84,11 +87,13 @@ class AnalyticsService:
         self,
         db: Session,
         trip_id: int,
+        user_id: int,
     ) -> TripProgressResponse:
-        trip = self.trip_repository.get_by_id(db, trip_id)
-
-        if trip is None:
-            raise ResourceNotFoundException(TRIP_NOT_FOUND)
+        trip = self.authorization_service.ensure_trip_owner(
+            db=db,
+            trip_id=trip_id,
+            current_user_id=user_id,
+        )
 
         bookings = self.booking_repository.get_by_trip_id(db, trip_id)
         checklists = self.checklist_repository.get_by_trip_id(db, trip_id)

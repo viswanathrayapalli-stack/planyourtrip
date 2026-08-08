@@ -7,6 +7,14 @@ class Settings(BaseSettings):
     app_name: str = "PlanYourTrip API"
     app_version: str = "0.1.0"
 
+    SMTP_HOST: str = "localhost"
+    SMTP_PORT: int = 1025
+    SMTP_USERNAME: str = ""
+    SMTP_PASSWORD: str = ""
+    SMTP_FROM_EMAIL: str = "noreply@planyourtrip.com"
+    SMTP_FROM_NAME: str = "PlanYourTrip"
+    SMTP_USE_TLS: bool = False
+
     UPLOAD_DIR: str = "uploads"
     MAX_UPLOAD_SIZE: int = 10 * 1024 * 1024
     ALLOWED_FILE_EXTENSIONS: list[str] = [

@@ -5,6 +5,7 @@ from app.modules.trip.repository import TripRepository
 from app.modules.trip_share.repository import TripShareRepository
 from app.modules.trip_share.schemas import TripShareCreate, TripShareResponse
 from app.modules.user.repository import UserRepository
+from app.shared.email import EmailService
 from app.shared.exceptions.exceptions import ResourceNotFoundException, ValidationException
 
 
@@ -15,10 +16,12 @@ class TripShareService:
         repository: TripShareRepository,
         trip_repository: TripRepository,
         user_repository: UserRepository,
+        email_service: EmailService,
     ):
         self.repository = repository
         self.trip_repository = trip_repository
         self.user_repository = user_repository
+        self.email_service = email_service
 
     def get_by_trip_id(
         self,
@@ -80,6 +83,19 @@ class TripShareService:
 
         share = self.repository.model(**request.model_dump())
         share = self.repository.create(db, share)
+
+        try:
+            self.email_service.send_email(
+                to_email=user.email,
+                subject="Trip Invitation",
+                body=(
+                    f"Hello {user.full_name},\n\n"
+                    f"You have been invited to join trip #{share.trip_id}.\n"
+                    f"Permission: {share.permission}."
+                ),
+            )
+        except Exception:
+            pass
 
         return TripShareResponse(
             id=share.id,

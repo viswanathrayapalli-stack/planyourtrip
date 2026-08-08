@@ -40,6 +40,7 @@ from app.modules.user.repository import UserRepository, user_repository
 from app.modules.user.service import UserService
 from app.shared.authorization import AuthorizationService
 from app.shared.database.session import get_db
+from app.shared.email import EmailService
 from app.shared.exceptions.exceptions import AuthenticationException
 from app.shared.storage.file_validator import FileValidator
 from app.shared.storage.local_storage import LocalStorageService
@@ -183,11 +184,18 @@ def get_favorite_service(
     )
 
 
-def get_trip_share_service() -> TripShareService:
+def get_email_service() -> EmailService:
+    return EmailService()
+
+
+def get_trip_share_service(
+    email_service: EmailService = Depends(get_email_service),
+) -> TripShareService:
     return TripShareService(
         trip_share_repository,
         trip_repository,
         UserRepository(),
+        email_service,
     )
 
 

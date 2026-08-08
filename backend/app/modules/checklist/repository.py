@@ -2,6 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.modules.checklist.models import Checklist
+from app.shared.query_builder import QueryBuilder
 from app.shared.pagination import PageResponse, PaginationParams
 from app.shared.repositories.base_repository import BaseRepository
 
@@ -30,11 +31,12 @@ class ChecklistRepository(BaseRepository[Checklist]):
         trip_id: int,
         pagination: PaginationParams,
     ) -> PageResponse[Checklist]:
-        stmt = (
-            select(Checklist)
-            .where(Checklist.trip_id == trip_id)
-            .order_by(Checklist.created_at.desc())
+        builder = QueryBuilder(
+            select(Checklist).where(Checklist.trip_id == trip_id)
         )
+        builder.order_by(Checklist.created_at.desc())
+
+        stmt = builder.build()
         return self.paginate(
             db=db,
             stmt=stmt,

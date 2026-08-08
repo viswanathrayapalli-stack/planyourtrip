@@ -9,6 +9,13 @@ from app.modules.trip.schemas import (
 )
 from app.modules.trip.service import TripService
 from app.modules.user.models import User
+from app.shared.filtering import (
+    DateRangeParams,
+    SearchParams,
+    SortParams,
+    StatusFilterParams,
+    TripFilterParams,
+)
 from app.shared.pagination import PageResponse, PaginationParams
 
 router = APIRouter(prefix="/trips", tags=["Trips"])
@@ -23,11 +30,21 @@ def get_all(
     service: TripService = Depends(get_trip_service),
     current_user: User = Depends(get_current_user),
     pagination: PaginationParams = Depends(),
+    sort: SortParams = Depends(),
+    trip_filter: TripFilterParams = Depends(),
+    status_filter: StatusFilterParams = Depends(),
+    search: SearchParams = Depends(),
+    date_range: DateRangeParams = Depends(),
 ):
     return service.get_all_paginated(
         db=db,
         user_id=current_user.id,
         pagination=pagination,
+        sort=sort,
+        trip_filter=trip_filter,
+        status_filter=status_filter,
+        search=search,
+        date_range=date_range,
     )
 
 

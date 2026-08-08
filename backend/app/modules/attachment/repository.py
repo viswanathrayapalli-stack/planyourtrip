@@ -2,6 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.modules.attachment.models import Attachment
+from app.shared.query_builder import QueryBuilder
 from app.shared.pagination import PageResponse, PaginationParams
 from app.shared.repositories.base_repository import BaseRepository
 
@@ -29,11 +30,12 @@ class AttachmentRepository(BaseRepository[Attachment]):
         trip_id: int,
         pagination: PaginationParams,
     ) -> PageResponse[Attachment]:
-        stmt = (
-            select(Attachment)
-            .where(Attachment.trip_id == trip_id)
-            .order_by(Attachment.created_at.desc())
+        builder = QueryBuilder(
+            select(Attachment).where(Attachment.trip_id == trip_id)
         )
+        builder.order_by(Attachment.created_at.desc())
+
+        stmt = builder.build()
         return self.paginate(
             db=db,
             stmt=stmt,

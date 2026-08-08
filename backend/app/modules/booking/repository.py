@@ -2,6 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.modules.booking.models import Booking
+from app.shared.query_builder import QueryBuilder
 from app.shared.pagination import PageResponse, PaginationParams
 from app.shared.repositories.base_repository import BaseRepository
 
@@ -29,11 +30,12 @@ class BookingRepository(BaseRepository[Booking]):
         trip_id: int,
         pagination: PaginationParams,
     ) -> PageResponse[Booking]:
-        stmt = (
-            select(Booking)
-            .where(Booking.trip_id == trip_id)
-            .order_by(Booking.travel_date.asc())
+        builder = QueryBuilder(
+            select(Booking).where(Booking.trip_id == trip_id)
         )
+        builder.order_by(Booking.travel_date.asc())
+
+        stmt = builder.build()
         return self.paginate(
             db=db,
             stmt=stmt,

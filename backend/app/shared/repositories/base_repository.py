@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.shared.database.base import Base
 from app.shared.pagination import PageResponse, PaginationParams
+from app.shared.query_builder import QueryBuilder
 
 ModelType = TypeVar("ModelType", bound=Base)
 
@@ -37,7 +38,12 @@ class BaseRepository(Generic[ModelType]):
         total = db.scalar(
             select(func.count()).select_from(stmt.subquery())
         ) or 0
-        paginated_stmt = stmt.offset(pagination.offset).limit(pagination.page_size)
+        paginated_stmt = (
+            QueryBuilder(stmt)
+            .offset(pagination.offset)
+            .limit(pagination.page_size)
+            .build()
+        )
         items = list(db.scalars(paginated_stmt).all())
         total_pages = max(
             1,

@@ -6,6 +6,8 @@ from app.core.lifespan import lifespan
 from app.core.settings import settings
 from app.api.v1.ai import router as ai_router
 from app.shared.exceptions.handlers import register_exception_handlers
+from app.shared.middleware.request_logging import RequestLoggingMiddleware
+from app.shared.middleware.request_id import RequestIDMiddleware
 #from app.modules.destination.api import router as destination_router
 from app.api.router import api_router
 
@@ -16,6 +18,8 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
 
     )
+    app.add_middleware(RequestLoggingMiddleware)
+    app.add_middleware(RequestIDMiddleware)
 
     register_exception_handlers(app)
     app.include_router(api_router)

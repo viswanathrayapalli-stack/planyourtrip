@@ -40,7 +40,7 @@ class FavoriteService:
         response = []
 
         for favorite in favorites:
-            place = self.place_repository.get_by_id(db, favorite.place_id)
+            place = favorite.place
 
             if place is None:
                 raise ResourceNotFoundException("Place not found.")

@@ -42,8 +42,10 @@ from app.shared.authorization import AuthorizationService
 from app.shared.database.session import get_db
 from app.shared.email import EmailService
 from app.shared.exceptions.exceptions import AuthenticationException
+from app.ai.providers import AIProvider, OpenAIProvider
 from app.shared.storage.file_validator import FileValidator
 from app.shared.storage.local_storage import LocalStorageService
+from app.shared.storage.storage_service import StorageService
 
 
 def get_place_service(
@@ -188,6 +190,14 @@ def get_email_service() -> EmailService:
     return EmailService()
 
 
+def get_ai_provider() -> AIProvider:
+    return OpenAIProvider()
+
+
+def get_storage_service() -> StorageService:
+    return LocalStorageService()
+
+
 def get_trip_share_service(
     email_service: EmailService = Depends(get_email_service),
 ) -> TripShareService:
@@ -201,12 +211,13 @@ def get_trip_share_service(
 
 def get_attachment_service(
     authorization_service: AuthorizationService = Depends(get_authorization_service),
+    storage: StorageService = Depends(get_storage_service),
 ) -> AttachmentService:
     return AttachmentService(
         attachment_repository,
         trip_repository,
         authorization_service,
-        LocalStorageService(),
+        storage,
         FileValidator(),
     )
 

@@ -7,6 +7,12 @@ class Settings(BaseSettings):
     app_name: str = "PlanYourTrip API"
     app_version: str = "0.1.0"
 
+    # ==========================
+    # AI Configuration
+    # ==========================
+    OPENAI_API_KEY: str = ""
+    OPENAI_MODEL: str = "gpt-5.5"
+
     SMTP_HOST: str = "localhost"
     SMTP_PORT: int = 1025
     SMTP_USERNAME: str = ""

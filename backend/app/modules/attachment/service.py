@@ -8,7 +8,7 @@ from app.modules.trip.repository import TripRepository
 from app.shared.exceptions.exceptions import ResourceNotFoundException
 from app.shared.pagination import PageResponse, PaginationParams
 from app.shared.storage.file_validator import FileValidator
-from app.shared.storage.local_storage import LocalStorageService
+from app.shared.storage.storage_service import StorageService
 
 
 class AttachmentService:
@@ -18,7 +18,7 @@ class AttachmentService:
         repository: AttachmentRepository,
         trip_repository: TripRepository,
         authorization_service: AuthorizationService,
-        storage: LocalStorageService,
+        storage: StorageService,
         file_validator: FileValidator,
     ):
         self.repository = repository

@@ -5,9 +5,10 @@ import uuid
 from fastapi import UploadFile
 
 from app.core.settings import settings
+from app.shared.storage.storage_service import StorageService
 
 
-class LocalStorageService:
+class LocalStorageService(StorageService):
 
     def __init__(self):
         self.upload_dir = Path(settings.UPLOAD_DIR)

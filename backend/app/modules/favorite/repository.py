@@ -1,7 +1,8 @@
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app.modules.favorite.models import Favorite
+from app.shared.query_builder import QueryBuilder
 from app.shared.repositories.base_repository import BaseRepository
 
 
@@ -16,9 +17,11 @@ class FavoriteRepository(BaseRepository[Favorite]):
         trip_id: int,
     ) -> list[Favorite]:
         stmt = (
-            select(Favorite)
+            QueryBuilder(select(Favorite))
             .where(Favorite.trip_id == trip_id)
+            .options(joinedload(Favorite.place))
             .order_by(Favorite.created_at.desc())
+            .build()
         )
         return list(db.scalars(stmt).all())
 

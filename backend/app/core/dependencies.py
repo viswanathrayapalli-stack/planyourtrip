@@ -4,6 +4,8 @@ from jose import JWTError
 from sqlalchemy.orm import Session
 
 from app.core.security import decode_access_token
+from app.ai.providers import AIProvider, OpenAIProvider
+from app.ai.services import ItineraryAIService
 from app.modules.destination.repository import DestinationRepository
 from app.modules.destination.service import DestinationService
 from app.modules.identity.constants import UNAUTHORIZED
@@ -42,7 +44,6 @@ from app.shared.authorization import AuthorizationService
 from app.shared.database.session import get_db
 from app.shared.email import EmailService
 from app.shared.exceptions.exceptions import AuthenticationException
-from app.ai.providers import AIProvider, OpenAIProvider
 from app.shared.storage.file_validator import FileValidator
 from app.shared.storage.local_storage import LocalStorageService
 from app.shared.storage.storage_service import StorageService
@@ -192,6 +193,12 @@ def get_email_service() -> EmailService:
 
 def get_ai_provider() -> AIProvider:
     return OpenAIProvider()
+
+
+def get_itinerary_ai_service() -> ItineraryAIService:
+    return ItineraryAIService(
+        provider=get_ai_provider(),
+    )
 
 
 def get_storage_service() -> StorageService:

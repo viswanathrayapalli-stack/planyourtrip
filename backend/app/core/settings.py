@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     # ==========================
     OPENAI_API_KEY: str = ""
     OPENAI_MODEL: str = "gpt-5.5"
+    OPENAI_BASE_URL: str | None = None
 
     SMTP_HOST: str = "localhost"
     SMTP_PORT: int = 1025

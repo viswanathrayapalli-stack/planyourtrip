@@ -1,4 +1,5 @@
 from functools import lru_cache
+from typing import Literal
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -11,7 +12,7 @@ class Settings(BaseSettings):
     # AI Configuration
     # ==========================
     AI_ENABLED: bool = True
-    AI_PROVIDER: str = "openai"
+    AI_PROVIDER: Literal["openai", "mock"] = "openai"
     OPENAI_API_KEY: str = ""
     OPENAI_MODEL: str = "gpt-5.6-luna"
     OPENAI_BASE_URL: str | None = None

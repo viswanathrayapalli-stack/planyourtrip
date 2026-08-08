@@ -7,6 +7,10 @@ from app.modules.trip_share.schemas import TripShareCreate, TripShareResponse
 from app.modules.user.repository import UserRepository
 from app.shared.email import EmailService
 from app.shared.exceptions.exceptions import ResourceNotFoundException, ValidationException
+from app.shared.logging import get_logger
+
+
+logger = get_logger(__name__)
 
 
 class TripShareService:
@@ -95,7 +99,9 @@ class TripShareService:
                 ),
             )
         except Exception:
-            pass
+            logger.exception(
+                "Failed to send trip invitation email."
+            )
 
         return TripShareResponse(
             id=share.id,

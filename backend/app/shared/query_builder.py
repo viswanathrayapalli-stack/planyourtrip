@@ -36,5 +36,9 @@ class QueryBuilder:
             self.stmt = self.stmt.order_by(desc_column)
         return self
 
+    def options(self, *options):
+        self.stmt = self.stmt.options(*options)
+        return self
+
     def build(self):
         return self.stmt

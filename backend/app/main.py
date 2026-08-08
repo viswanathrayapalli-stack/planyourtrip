@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from fastapi import FastAPI
 
 from app.core.lifespan import lifespan
@@ -33,7 +35,17 @@ def create_app() -> FastAPI:
     async def health():
         return {
             "status": "healthy",
+            "application": settings.app_name,
+            "version": settings.app_version,
             "environment": settings.environment,
+            "ai": {
+                "enabled": settings.AI_ENABLED,
+                "provider": settings.AI_PROVIDER,
+            },
+            "storage": {
+                "provider": "local",
+            },
+            "timestamp": datetime.now(timezone.utc).isoformat(),
         }
 
     return app

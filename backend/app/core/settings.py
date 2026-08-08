@@ -10,8 +10,9 @@ class Settings(BaseSettings):
     # ==========================
     # AI Configuration
     # ==========================
+    AI_ENABLED: bool = True
     OPENAI_API_KEY: str = ""
-    OPENAI_MODEL: str = "gpt-5.5"
+    OPENAI_MODEL: str = "gpt-5.6-luna"
     OPENAI_BASE_URL: str | None = None
 
     SMTP_HOST: str = "localhost"

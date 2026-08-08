@@ -1,0 +1,1 @@
+AI_DISABLED = "AI functionality is currently disabled."

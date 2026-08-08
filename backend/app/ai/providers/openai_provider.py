@@ -1,5 +1,6 @@
 from openai import APIError, AuthenticationError, OpenAI
 
+from app.ai.constants import AI_DISABLED
 from app.ai.providers.ai_provider import AIProvider
 from app.core.settings import settings
 from app.shared.exceptions.exceptions import ValidationException
@@ -26,6 +27,9 @@ class OpenAIProvider(AIProvider):
         self,
         prompt: str,
     ) -> str:
+        if not settings.AI_ENABLED:
+            raise ValidationException(AI_DISABLED)
+
         try:
             response = self.client.responses.create(
                 model=self.model,

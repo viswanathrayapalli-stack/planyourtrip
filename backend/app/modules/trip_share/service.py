@@ -42,7 +42,7 @@ class TripShareService:
         response: list[TripShareResponse] = []
 
         for share in shares:
-            user = self.user_repository.get_by_id(db, share.user_id)
+            user = share.user
 
             if user is None:
                 raise ResourceNotFoundException("User not found.")

@@ -1,7 +1,8 @@
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app.modules.trip_share.models import TripShare
+from app.shared.query_builder import QueryBuilder
 from app.shared.repositories.base_repository import BaseRepository
 
 
@@ -16,9 +17,11 @@ class TripShareRepository(BaseRepository[TripShare]):
         trip_id: int,
     ) -> list[TripShare]:
         stmt = (
-            select(TripShare)
+            QueryBuilder(select(TripShare))
             .where(TripShare.trip_id == trip_id)
+            .options(joinedload(TripShare.user))
             .order_by(TripShare.created_at.asc())
+            .build()
         )
         return list(db.scalars(stmt).all())
 

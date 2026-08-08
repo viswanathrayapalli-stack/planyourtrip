@@ -7,6 +7,15 @@ class Settings(BaseSettings):
     app_name: str = "PlanYourTrip API"
     app_version: str = "0.1.0"
 
+    UPLOAD_DIR: str = "uploads"
+    MAX_UPLOAD_SIZE: int = 10 * 1024 * 1024
+    ALLOWED_FILE_EXTENSIONS: list[str] = [
+        ".pdf",
+        ".jpg",
+        ".jpeg",
+        ".png",
+    ]
+
     environment: str = "development"
     debug: bool = True
 

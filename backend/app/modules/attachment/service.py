@@ -7,6 +7,8 @@ from app.modules.trip.constants import TRIP_NOT_FOUND
 from app.modules.trip.repository import TripRepository
 from app.shared.exceptions.exceptions import ResourceNotFoundException
 from app.shared.pagination import PageResponse, PaginationParams
+from app.shared.storage.file_validator import FileValidator
+from app.shared.storage.local_storage import LocalStorageService
 
 
 class AttachmentService:
@@ -16,10 +18,14 @@ class AttachmentService:
         repository: AttachmentRepository,
         trip_repository: TripRepository,
         authorization_service: AuthorizationService,
+        storage: LocalStorageService,
+        file_validator: FileValidator,
     ):
         self.repository = repository
         self.trip_repository = trip_repository
         self.authorization_service = authorization_service
+        self.storage = storage
+        self.file_validator = file_validator
 
     def get_by_trip_id(
         self,
@@ -96,7 +102,24 @@ class AttachmentService:
             current_user_id=user_id,
         )
 
-        attachment = self.repository.model(**request.model_dump())
+        file = request.file
+
+        self.file_validator.validate(file)
+        generated_filename, file_path = self.storage.save_file(file)
+
+        file.file.seek(0, 2)
+        file_size = file.file.tell()
+        file.file.seek(0)
+
+        attachment = self.repository.model(
+            trip_id=request.trip_id,
+            file_name=generated_filename,
+            original_file_name=file.filename or "",
+            file_type=file.content_type or "",
+            file_size=file_size,
+            file_path=file_path,
+            category=request.category,
+        )
         attachment = self.repository.create(db, attachment)
 
         return AttachmentResponse(

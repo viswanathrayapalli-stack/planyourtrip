@@ -6,12 +6,13 @@ from sqlalchemy.orm import Session
 from app.core.lifespan import lifespan
 from app.core.health import HealthService
 from app.core.settings import settings
-from app.core.dependencies import get_db, get_health_service
+from app.core.dependencies import get_current_user, get_db, get_health_service
 from app.api.v1.ai import router as ai_router
 from app.shared.exceptions.handlers import register_exception_handlers
 from app.shared.middleware.request_logging import RequestLoggingMiddleware
 from app.shared.middleware.request_id import RequestIDMiddleware
 from app.shared.metrics.request_metrics import request_metrics
+from app.modules.user.models import User
 #from app.modules.destination.api import router as destination_router
 from app.api.router import api_router
 
@@ -46,7 +47,9 @@ def create_app() -> FastAPI:
         }
 
     @app.get("/metrics")
-    async def metrics():
+    async def metrics(
+        _current_user: User = Depends(get_current_user),
+    ):
         return request_metrics.snapshot()
 
     @app.get("/health")

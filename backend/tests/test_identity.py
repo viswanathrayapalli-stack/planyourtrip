@@ -90,6 +90,80 @@ def test_current_user_profile_rejects_invalid_token() -> None:
     assert payload["request_id"]
 
 
+def test_current_user_profile_rejects_token_without_subject() -> None:
+    class FakeDB:
+        pass
+
+    token = create_access_token({"role": "user"})
+
+    app.dependency_overrides[get_db] = lambda: FakeDB()
+
+    try:
+        response = client.get(
+            "/api/v1/identity/me",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+    finally:
+        app.dependency_overrides.pop(get_db, None)
+
+    assert response.status_code == 401
+    payload = response.json()
+    assert payload["success"] is False
+    assert payload["data"] is None
+    assert payload["request_id"]
+
+
+def test_current_user_profile_rejects_nonexistent_user() -> None:
+    class FakeDB:
+        pass
+
+    app.dependency_overrides[get_db] = lambda: FakeDB()
+
+    try:
+        with patch.object(core_dependencies.user_repository, "get_by_id", return_value=None):
+            token = create_access_token({"sub": "999999"})
+            response = client.get(
+                "/api/v1/identity/me",
+                headers={"Authorization": f"Bearer {token}"},
+            )
+    finally:
+        app.dependency_overrides.pop(get_db, None)
+
+    assert response.status_code == 401
+    payload = response.json()
+    assert payload["success"] is False
+    assert payload["data"] is None
+    assert payload["request_id"]
+
+
+def test_current_user_profile_rejects_inactive_user() -> None:
+    class FakeDB:
+        pass
+
+    fake_user = SimpleNamespace(
+        id=8,
+        is_active=False,
+    )
+
+    app.dependency_overrides[get_db] = lambda: FakeDB()
+
+    try:
+        with patch.object(core_dependencies.user_repository, "get_by_id", return_value=fake_user):
+            token = create_access_token({"sub": str(fake_user.id)})
+            response = client.get(
+                "/api/v1/identity/me",
+                headers={"Authorization": f"Bearer {token}"},
+            )
+    finally:
+        app.dependency_overrides.pop(get_db, None)
+
+    assert response.status_code == 401
+    payload = response.json()
+    assert payload["success"] is False
+    assert payload["data"] is None
+    assert payload["request_id"]
+
+
 def test_current_user_profile_returns_current_user() -> None:
     class FakeDB:
         pass

@@ -2,6 +2,7 @@ from typing import Any
 
 from fastapi.testclient import TestClient
 from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
 
 from app.core.dependencies import get_db
 from app.main import app
@@ -57,6 +58,30 @@ def test_ready_returns_ready_when_database_check_passes() -> None:
     payload = response.json()
     assert payload["status"] == "ready"
     assert payload["checks"]["database"] == "up"
+    assert "ai" in payload["checks"]
+    assert "storage" in payload["checks"]
+    assert "application" in payload
+    assert "version" in payload
+    assert "environment" in payload
+    assert "timestamp" in payload
+
+
+def test_ready_returns_not_ready_when_database_check_fails() -> None:
+    class FailingDB:
+        def execute(self, statement: Any) -> Any:
+            raise SQLAlchemyError("database down")
+
+    app.dependency_overrides[get_db] = lambda: FailingDB()
+
+    try:
+        response = client.get("/ready")
+    finally:
+        app.dependency_overrides.pop(get_db, None)
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["status"] == "not_ready"
+    assert payload["checks"]["database"] == "down"
     assert "ai" in payload["checks"]
     assert "storage" in payload["checks"]
     assert "application" in payload

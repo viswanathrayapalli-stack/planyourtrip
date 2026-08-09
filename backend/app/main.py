@@ -11,6 +11,7 @@ from app.api.v1.ai import router as ai_router
 from app.shared.exceptions.handlers import register_exception_handlers
 from app.shared.middleware.request_logging import RequestLoggingMiddleware
 from app.shared.middleware.request_id import RequestIDMiddleware
+from app.shared.metrics.request_metrics import request_metrics
 #from app.modules.destination.api import router as destination_router
 from app.api.router import api_router
 
@@ -43,6 +44,10 @@ def create_app() -> FastAPI:
         return {
             "status": "alive",
         }
+
+    @app.get("/metrics")
+    async def metrics():
+        return request_metrics.snapshot()
 
     @app.get("/health")
     async def health():

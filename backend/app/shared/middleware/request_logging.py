@@ -4,6 +4,7 @@ from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 
 from app.shared.logging import get_logger
+from app.shared.metrics.request_metrics import request_metrics
 
 
 logger = get_logger(__name__)
@@ -40,6 +41,14 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
         finally:
             duration_ms = (time.perf_counter() - start) * 1000
             status_code = response.status_code if response is not None else "ERROR"
+
+            if path != "/metrics":
+                request_metrics.record_completed_request(
+                    method=method,
+                    path=path,
+                    status_code=status_code,
+                    duration_ms=duration_ms,
+                )
 
             logger.info(
                 "request.completed request_id=%s method=%s path=%s client_ip=%s status_code=%s duration_ms=%.2f",

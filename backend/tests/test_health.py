@@ -46,6 +46,23 @@ def test_live_response_contains_request_id_header() -> None:
     assert "X-Request-ID" in response.headers
 
 
+def test_request_id_is_unique_across_requests() -> None:
+    first_response = client.get("/live")
+    second_response = client.get("/live")
+
+    assert first_response.status_code == 200
+    assert second_response.status_code == 200
+
+    first_request_id = first_response.headers.get("X-Request-ID")
+    second_request_id = second_response.headers.get("X-Request-ID")
+
+    assert first_request_id
+    assert second_request_id
+    assert isinstance(first_request_id, str)
+    assert isinstance(second_request_id, str)
+    assert first_request_id != second_request_id
+
+
 def test_ready_returns_ready_when_database_check_passes() -> None:
     app.dependency_overrides[get_db] = lambda: FakeDB()
 

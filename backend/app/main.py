@@ -38,6 +38,12 @@ def create_app() -> FastAPI:
             "version": settings.app_version,
         }
 
+    @app.get("/live")
+    async def live():
+        return {
+            "status": "alive",
+        }
+
     @app.get("/health")
     async def health():
         return {

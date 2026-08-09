@@ -3,5 +3,4 @@ from pydantic import BaseModel
 
 
 class TripFilterParams(BaseModel):
-    destination: str | None = Query(default=None)
-    status: str | None = Query(default=None)
+    is_active: bool | None = Query(default=None)

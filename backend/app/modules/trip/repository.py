@@ -3,11 +3,9 @@ from sqlalchemy.orm import Session
 
 from app.modules.trip.models import Trip
 from app.shared.filtering import (
-    DateRangeParams,
     SearchParams,
     SortOrder,
     SortParams,
-    StatusFilterParams,
     TripFilterParams,
 )
 from app.shared.query_builder import QueryBuilder
@@ -47,44 +45,24 @@ class TripRepository(BaseRepository[Trip]):
         pagination: PaginationParams,
         sort: SortParams,
         trip_filter: TripFilterParams,
-        status_filter: StatusFilterParams,
         search: SearchParams,
-        date_range: DateRangeParams,
     ) -> PageResponse[Trip]:
-        builder = QueryBuilder(
-            select(Trip).where(Trip.user_id == user_id)
-        )
+        builder = QueryBuilder(select(Trip).where(Trip.user_id == user_id))
 
         builder.where_if(
-            trip_filter.destination,
-            Trip.destination.ilike(f"%{trip_filter.destination}%"),
-        )
-
-        builder.where_if(
-            status_filter.status,
-            Trip.status == status_filter.status,
+            trip_filter.is_active is not None,
+            Trip.is_active == trip_filter.is_active,
         )
 
         builder.where_if(
             search.q,
             or_(
                 Trip.title.ilike(f"%{search.q}%"),
-                Trip.destination.ilike(f"%{search.q}%"),
                 Trip.description.ilike(f"%{search.q}%"),
             ),
         )
 
-        builder.where_if(
-            date_range.start_date,
-            Trip.start_date >= date_range.start_date,
-        )
-
-        builder.where_if(
-            date_range.end_date,
-            Trip.end_date <= date_range.end_date,
-        )
-
-        if sort.sort_by in {"created_at", "start_date", "title"}:
+        if sort.sort_by in {"created_at", "updated_at", "title"}:
             column = getattr(Trip, sort.sort_by)
 
             if sort.sort_order == SortOrder.ASC:

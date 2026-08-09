@@ -5,10 +5,8 @@ from app.modules.trip.repository import TripRepository
 from app.modules.trip.schemas import TripCreate, TripResponse, TripUpdate
 from app.shared.authorization import AuthorizationService
 from app.shared.filtering import (
-    DateRangeParams,
     SearchParams,
     SortParams,
-    StatusFilterParams,
     TripFilterParams,
 )
 from app.shared.pagination import PageResponse, PaginationParams
@@ -38,9 +36,7 @@ class TripService:
         pagination: PaginationParams,
         sort: SortParams,
         trip_filter: TripFilterParams,
-        status_filter: StatusFilterParams,
         search: SearchParams,
-        date_range: DateRangeParams,
     ) -> PageResponse[TripResponse]:
         page = self.repository.get_all_by_user_paginated(
             db=db,
@@ -48,9 +44,7 @@ class TripService:
             pagination=pagination,
             sort=sort,
             trip_filter=trip_filter,
-            status_filter=status_filter,
             search=search,
-            date_range=date_range,
         )
 
         return PageResponse(
